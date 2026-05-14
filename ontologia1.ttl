@@ -1,0 +1,296 @@
+@prefix : <http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2/> .
+
+<http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2> rdf:type owl:Ontology .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#anira_a
+:anira_a rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf owl:topObjectProperty ;
+         rdf:type owl:TransitiveProperty ;
+         rdfs:domain :Viatge ;
+         rdfs:range :Ciutat .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#arriba_de
+:arriba_de rdf:type owl:ObjectProperty ;
+           rdfs:subPropertyOf owl:topObjectProperty ;
+           rdfs:domain :Mitja_de_Transport ;
+           rdfs:range :Ciutat .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#conté
+:conté rdf:type owl:ObjectProperty ,
+                owl:TransitiveProperty ;
+       rdfs:domain :Ciutat ;
+       rdfs:range :Atraccio .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#dormira_en
+:dormira_en rdf:type owl:ObjectProperty ;
+            rdfs:subPropertyOf owl:topObjectProperty ;
+            rdf:type owl:TransitiveProperty ;
+            rdfs:domain :Viatge ;
+            rdfs:range :Allotjament .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#fara_un
+:fara_un rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf owl:topObjectProperty ;
+         rdf:type owl:FunctionalProperty ;
+         rdfs:domain :Usuari ;
+         rdfs:range :Viatge .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#ofereix
+:ofereix rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf owl:topObjectProperty ;
+         rdf:type owl:TransitiveProperty ;
+         rdfs:domain :Ciutat ;
+         rdfs:range :Allotjament .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#surt_de
+:surt_de rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf owl:topObjectProperty ;
+         rdfs:domain :Mitja_de_Transport ;
+         rdfs:range :Ciutat .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#transporta_amb
+:transporta_amb rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf owl:topObjectProperty ;
+                rdf:type owl:TransitiveProperty ;
+                rdfs:domain :Ciutat ;
+                rdfs:range :Mitja_de_Transport .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#viatjara_amb
+:viatjara_amb rdf:type owl:ObjectProperty ;
+              rdfs:subPropertyOf owl:topObjectProperty ;
+              rdf:type owl:TransitiveProperty ;
+              rdfs:domain :Viatge ;
+              rdfs:range :Mitja_de_Transport .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#dia
+:dia rdf:type owl:DatatypeProperty ;
+     rdfs:subPropertyOf owl:topDataProperty ;
+     rdfs:domain :Mitja_de_Transport ;
+     rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#dies_per_ciutat
+:dies_per_ciutat rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdfs:domain :Viatge ;
+                 rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#duracio
+:duracio rdf:type owl:DatatypeProperty ;
+         rdfs:subPropertyOf owl:topDataProperty ;
+         rdfs:domain :Viatge ;
+         rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#duracio_per_menys_pressupost
+:duracio_per_menys_pressupost rdf:type owl:DatatypeProperty ;
+                              rdfs:domain :Usuari ;
+                              rdfs:range xsd:boolean .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#edat
+:edat rdf:type owl:DatatypeProperty ;
+      rdfs:subPropertyOf owl:topDataProperty ;
+      rdfs:domain :Usuari ;
+      rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#esdev_especial
+:esdev_especial rdf:type owl:DatatypeProperty ;
+                rdfs:subPropertyOf owl:topDataProperty ;
+                rdfs:domain :Usuari ;
+                rdfs:range xsd:boolean .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#hora
+:hora rdf:type owl:DatatypeProperty ;
+      rdfs:subPropertyOf owl:topDataProperty ;
+      rdfs:domain :Mitja_de_Transport ;
+      rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#max_ciutats
+:max_ciutats rdf:type owl:DatatypeProperty ;
+             rdfs:subPropertyOf owl:topDataProperty ;
+             rdfs:domain :Usuari ;
+             rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#max_dies
+:max_dies rdf:type owl:DatatypeProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :Usuari ;
+          rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#max_dies_ciutat
+:max_dies_ciutat rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdfs:domain :Usuari ;
+                 rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#menys_coneguts
+:menys_coneguts rdf:type owl:DatatypeProperty ;
+                rdfs:subPropertyOf owl:topDataProperty ;
+                rdfs:domain :Usuari ;
+                rdfs:range xsd:boolean .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#mes
+:mes rdf:type owl:DatatypeProperty ;
+     rdfs:subPropertyOf owl:topDataProperty ;
+     rdfs:domain :Mitja_de_Transport ;
+     rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#min_ciutats
+:min_ciutats rdf:type owl:DatatypeProperty ;
+             rdfs:subPropertyOf owl:topDataProperty ;
+             rdfs:domain :Usuari ;
+             rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#min_dies
+:min_dies rdf:type owl:DatatypeProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :Usuari ;
+          rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#min_dies_ciutat
+:min_dies_ciutat rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdfs:domain :Usuari ;
+                 rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#nens
+:nens rdf:type owl:DatatypeProperty ;
+      rdfs:subPropertyOf owl:topDataProperty ;
+      rdfs:domain :Usuari ;
+      rdfs:range xsd:boolean .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#nivell_cultural
+:nivell_cultural rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdfs:domain :Usuari ;
+                 rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#nom_atraccio
+:nom_atraccio rdf:type owl:DatatypeProperty ;
+              rdfs:domain :Atraccio ;
+              rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#objectiu_viatge
+:objectiu_viatge rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdfs:domain :Usuari ;
+                 rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#pressupost
+:pressupost rdf:type owl:DatatypeProperty ;
+            rdfs:subPropertyOf owl:topDataProperty ;
+            rdfs:domain :Usuari ;
+            rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#preu_total
+:preu_total rdf:type owl:DatatypeProperty ;
+            rdfs:subPropertyOf owl:topDataProperty ;
+            rdfs:domain :Viatge ;
+            rdfs:range xsd:double .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#qualitat
+:qualitat rdf:type owl:DatatypeProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :Allotjament ;
+          rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#qualitat_allotjament
+:qualitat_allotjament rdf:type owl:DatatypeProperty ;
+                      rdfs:subPropertyOf owl:topDataProperty ;
+                      rdfs:domain :Usuari ;
+                      rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#qualitat_per_menys_pressupost
+:qualitat_per_menys_pressupost rdf:type owl:DatatypeProperty ;
+                               rdfs:subPropertyOf owl:topDataProperty ;
+                               rdfs:domain :Usuari ;
+                               rdfs:range xsd:boolean .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#tipus_grup
+:tipus_grup rdf:type owl:DatatypeProperty ;
+            rdfs:subPropertyOf owl:topDataProperty ;
+            rdfs:domain :Usuari ;
+            rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#tipus_transport
+:tipus_transport rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdfs:domain :Mitja_de_Transport ;
+                 rdfs:range xsd:string .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#Allotjament
+:Allotjament rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#Atraccio
+:Atraccio rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#Ciutat
+:Ciutat rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#Mitja_de_Transport
+:Mitja_de_Transport rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#Usuari
+:Usuari rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-2#Viatge
+:Viatge rdf:type owl:Class .
+
+
+###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi
