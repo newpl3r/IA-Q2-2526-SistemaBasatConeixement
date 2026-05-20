@@ -34,9 +34,14 @@
 
 (defrule RECOLLIDA-DADES::pregunta-dies
     =>
-    (printout t "Quants dies tens disponibles per viatjar? ")
-    (bind ?dies (read))
-    (send [usuari_actual] put-dies_disponibles ?dies)
+    (printout t "Quants dies tens disponibles per viatjar?" crlf
+    "Dies mínims: ")
+    (bind ?dies-min (read))
+    (printout t "Dies màxims: ")
+    (bind ?dies-max (read))
+
+    (send [usuari_actual] put-dies_min ?dies-min)
+    (send [usuari_actual] put-dies_max ?dies-max)
 )
 
 (defrule RECOLLIDA-DADES::pregunta-grup
@@ -52,6 +57,22 @@
         (send [usuari_actual] put-perfil_deduit INDIVIDUAL)
     else (if (eq ?resp amics) then
         (send [usuari_actual] put-perfil_deduit GRUP)
+    ))))
+)
+
+(defrule RECOLLIDA-DADES::pregunta-edat
+    =>
+    (printout t "Quants anys tens? ")
+    (bind ?resp (read))
+    (if (< ?resp 18) then
+        (send [usuari_actual] put-rang_edat MENOR)
+        (send [usuari_actual] put-viatja_amb_nens TRUE)
+    else (if (and (>= ?resp 18) (< ?resp 45)) then
+        (send [usuari_actual] put-rang_edat JOVE)
+    else (if (and (>= ?resp 45) (< ?resp 65)) then
+        (send [usuari_actual] put-rang_edat MITJANA-EDAT)
+    else (if (> ?resp 65) then
+        (send [usuari_actual] put-rang_edat GRAN)
     ))))
 )
 
@@ -120,7 +141,7 @@
     (make-instance [v1] of VIATGE (id_viatge "V1") (tipus_viatge ROMANTIC) (ciutat_desti "Paris") (preu_total 1200) (duracio_dies 7))
     (make-instance [v2] of VIATGE (id_viatge "V2") (tipus_viatge ROMANTIC) (ciutat_desti "Venecia") (preu_total 1400) (duracio_dies 5))
     (make-instance [v3] of VIATGE (id_viatge "V3") (tipus_viatge ROMANTIC) (ciutat_desti "Maldives") (preu_total 3500) (duracio_dies 10))
-    
+
     ;; VIATGES DE DIVERSIÓ (Família/Amics)
     (make-instance [v4] of VIATGE (id_viatge "V4") (tipus_viatge DIVERSIO) (ciutat_desti "Orlando") (preu_total 2500) (duracio_dies 10))
     (make-instance [v5] of VIATGE (id_viatge "V5") (tipus_viatge DIVERSIO) (ciutat_desti "Tenerife") (preu_total 900) (duracio_dies 7))
@@ -134,47 +155,49 @@
 
 (defrule RECOMANACIO::genera-dues-propostes
     ;; Afegim la condició per comprovar que no s'hagin imprès ja
-    (not (propostes-impreses)) 
-    
-    (object (is-a USUARI) (name [usuari_actual]) (objectiu_deduit ?obj) (pressupost_max ?pres) (dies_disponibles ?dies) (sacrifica_qualitat ?sacrifica))
-    
+    (not (propostes-impreses))
+
+    (object (is-a USUARI) (name [usuari_actual]) (objectiu_deduit ?obj) (pressupost_max ?pres) (dies_min ?dies-min) (dies_max ?dies-max) (sacrifica_qualitat ?sacrifica))
+
     (object (is-a VIATGE) (name ?v1) (tipus_viatge ?obj) (ciutat_desti ?desti1) (preu_total ?preu1) (duracio_dies ?dur1))
     (object (is-a VIATGE) (name ?v2) (tipus_viatge ?obj) (ciutat_desti ?desti2) (preu_total ?preu2) (duracio_dies ?dur2))
-    
-    (test (neq ?v1 ?v2)) 
-    (test (neq ?desti1 ?desti2)) 
-    (test (< (str-compare ?desti1 ?desti2) 0)) 
-    
-    (test (<= ?dur1 ?dies))
-    (test (<= ?dur2 ?dies))
-    
+
+    (test (neq ?v1 ?v2))
+    (test (neq ?desti1 ?desti2))
+    (test (< (str-compare ?desti1 ?desti2) 0))
+
+    (test (<= ?dur1 ?dies-max))
+    (test (>= ?dur1 ?dies-min))
+    (test (<= ?dur2 ?dies-max))
+    (test (>= ?dur2 ?dies-min))
+
     (test (or (<= ?preu1 ?pres) (and (eq ?sacrifica TRUE) (<= ?preu1 (* ?pres 1.25)))))
     (test (or (<= ?preu2 ?pres) (and (eq ?sacrifica TRUE) (<= ?preu2 (* ?pres 1.25)))))
     =>
     (printout t crlf "==========================================" crlf)
     (printout t " TENIM 2 PROPOSTES PER A TU (" ?obj "):" crlf)
     (printout t "==========================================" crlf)
-    
+
     (if (> ?preu1 ?pres) then
         (printout t " OPCIO 1: " ?desti1 " (" ?dur1 " dies) -> PREU AJUSTAT (Original: " ?preu1 " euros)" crlf)
     else
         (printout t " OPCIO 1: " ?desti1 " (" ?dur1 " dies) -> Preu normal: " ?preu1 " euros" crlf)
     )
-    
+
     (if (> ?preu2 ?pres) then
         (printout t " OPCIO 2: " ?desti2 " (" ?dur2 " dies) -> PREU AJUSTAT (Original: " ?preu2 " euros)" crlf)
     else
         (printout t " OPCIO 2: " ?desti2 " (" ?dur2 " dies) -> Preu normal: " ?preu2 " euros" crlf)
     )
     (printout t "==========================================" crlf)
-    
+
     (assert (solucio-trobada))
     ;; Marquem que ja hem imprès les propostes per aturar el bucle
-    (assert (propostes-impreses)) 
+    (assert (propostes-impreses))
 )
 
 (defrule RECOMANACIO::sense-propostes
-    (declare (salience -10)) 
+    (declare (salience -10))
     (not (solucio-trobada))
     =>
     (printout t crlf "==========================================" crlf)

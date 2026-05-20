@@ -2,11 +2,13 @@
 
 (defclass USUARI (is-a USER)
     (slot pressupost_max (type INTEGER))
-    (slot dies_disponibles (type INTEGER))
+    (slot dies_min (type INTEGER))
+    (slot dies_max (type INTEGER))
     (slot viatja_amb_nens (type SYMBOL) (allowed-values TRUE FALSE))
     (slot sacrifica_qualitat (type SYMBOL) (allowed-values TRUE FALSE))
     (slot perfil_deduit (type SYMBOL) (allowed-values INDIVIDUAL PARELLA FAMILIA GRUP DESCONEGUT) (default DESCONEGUT))
     (slot objectiu_deduit (type SYMBOL) (allowed-values ROMANTIC CULTURAL DESCANS DIVERSIO DESCONEGUT) (default DESCONEGUT))
+    (slot rang_edat (type SYMBOL) (allowed-values MENOR JOVE MITJANA-EDAT GRAN))
 )
 
 (defclass CIUTAT (is-a USER)
