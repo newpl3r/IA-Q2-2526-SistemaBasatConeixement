@@ -25,6 +25,22 @@
 ;;; MÒDUL 1: RECOLLIDA DE DADES
 ;;; ==============================================================
 
+(defrule RECOLLIDA-DADES::pregunta-edat
+    =>
+    (printout t "Quants anys tens? ")
+    (bind ?resp (read))
+    (if (< ?resp 18) then
+        (send [usuari_actual] put-rang_edat MENOR)
+        (send [usuari_actual] put-viatja_amb_nens TRUE)
+    else (if (and (>= ?resp 18) (< ?resp 45)) then
+        (send [usuari_actual] put-rang_edat JOVE)
+    else (if (and (>= ?resp 45) (< ?resp 65)) then
+        (send [usuari_actual] put-rang_edat MITJANA-EDAT)
+    else (if (> ?resp 65) then
+        (send [usuari_actual] put-rang_edat GRAN)
+    ))))
+)
+
 (defrule RECOLLIDA-DADES::pregunta-pressupost
     =>
     (printout t "Quin es el teu pressupost maxim aproximat (en euros)? ")
@@ -60,20 +76,16 @@
     ))))
 )
 
-(defrule RECOLLIDA-DADES::pregunta-edat
+(defrule RECOLLIDA-DADES::pregunta-num-ciutats
     =>
-    (printout t "Quants anys tens? ")
-    (bind ?resp (read))
-    (if (< ?resp 18) then
-        (send [usuari_actual] put-rang_edat MENOR)
-        (send [usuari_actual] put-viatja_amb_nens TRUE)
-    else (if (and (>= ?resp 18) (< ?resp 45)) then
-        (send [usuari_actual] put-rang_edat JOVE)
-    else (if (and (>= ?resp 45) (< ?resp 65)) then
-        (send [usuari_actual] put-rang_edat MITJANA-EDAT)
-    else (if (> ?resp 65) then
-        (send [usuari_actual] put-rang_edat GRAN)
-    ))))
+    (printout t "Quantes ciutats t'interesa visitar?" crlf
+    "Com a mínim: ")
+    (bind ?ciutats-min (read))
+    (printout t "Com a màxim: ")
+    (bind ?ciutats-max (read))
+
+    (send [usuari_actual] put-ciutats_min ?ciutats-min)
+    (send [usuari_actual] put-ciutats_max ?ciutats-max)
 )
 
 (defrule RECOLLIDA-DADES::pregunta-sacrifica-qualitat
@@ -123,77 +135,131 @@
 ;;; MÒDUL 3: RECOMANACIÓ I FILTRATGE
 ;;; ==============================================================
 
+(deftemplate RECOMANACIO::SOLUCIO-PARCIAL
+    (multislot viatges)
+    (slot dies_total (default 0))
+    (slot cost_total (default 0))
+)
+
+;;; --- Càrrega de dades (sense canvis) ---
 (defrule RECOMANACIO::carrega-dades
     (declare (salience 50))
     =>
-    ;; CIUTATS
-    (make-instance [c1] of CIUTAT (nom "Paris") (tematica EUROPEA_GRAN) (cost_diari_estimat 150))
-    (make-instance [c2] of CIUTAT (nom "Roma") (tematica MEDITERRANIA) (cost_diari_estimat 120))
-    (make-instance [c3] of CIUTAT (nom "Venecia") (tematica MEDITERRANIA) (cost_diari_estimat 160))
-    (make-instance [c4] of CIUTAT (nom "Orlando") (tematica DIVERSIO) (cost_diari_estimat 200))
-    (make-instance [c5] of CIUTAT (nom "Tenerife") (tematica DIVERSIO) (cost_diari_estimat 90))
-    (make-instance [c6] of CIUTAT (nom "Maldives") (tematica NATURALESA) (cost_diari_estimat 300))
-    (make-instance [c7] of CIUTAT (nom "Londres") (tematica EUROPEA_GRAN) (cost_diari_estimat 180))
-    (make-instance [c8] of CIUTAT (nom "Berlin") (tematica EUROPEA_GRAN) (cost_diari_estimat 110))
-    (make-instance [c9] of CIUTAT (nom "Bali") (tematica NATURALESA) (cost_diari_estimat 80))
+    (make-instance [c1] of CIUTAT (nom "Paris")    (tematica EUROPEA_GRAN)  (cost_diari_estimat 150))
+    (make-instance [c2] of CIUTAT (nom "Roma")     (tematica MEDITERRANIA)  (cost_diari_estimat 120))
+    (make-instance [c3] of CIUTAT (nom "Venecia")  (tematica MEDITERRANIA)  (cost_diari_estimat 160))
+    (make-instance [c4] of CIUTAT (nom "Orlando")  (tematica DIVERSIO)      (cost_diari_estimat 200))
+    (make-instance [c5] of CIUTAT (nom "Tenerife") (tematica DIVERSIO)      (cost_diari_estimat 90))
+    (make-instance [c6] of CIUTAT (nom "Maldives") (tematica NATURALESA)    (cost_diari_estimat 300))
+    (make-instance [c7] of CIUTAT (nom "Londres")  (tematica EUROPEA_GRAN)  (cost_diari_estimat 180))
+    (make-instance [c8] of CIUTAT (nom "Berlin")   (tematica EUROPEA_GRAN)  (cost_diari_estimat 110))
+    (make-instance [c9] of CIUTAT (nom "Bali")     (tematica NATURALESA)    (cost_diari_estimat 80))
 
-    ;; VIATGES ROMÀNTICS
-    (make-instance [v1] of VIATGE (id_viatge "V1") (tipus_viatge ROMANTIC) (ciutat_desti "Paris") (preu_total 1200) (duracio_dies 7))
-    (make-instance [v2] of VIATGE (id_viatge "V2") (tipus_viatge ROMANTIC) (ciutat_desti "Venecia") (preu_total 1400) (duracio_dies 5))
+    (make-instance [v1] of VIATGE (id_viatge "V1") (tipus_viatge ROMANTIC) (ciutat_desti "Paris")    (preu_total 1200) (duracio_dies 7))
+    (make-instance [v2] of VIATGE (id_viatge "V2") (tipus_viatge ROMANTIC) (ciutat_desti "Venecia")  (preu_total 1400) (duracio_dies 5))
     (make-instance [v3] of VIATGE (id_viatge "V3") (tipus_viatge ROMANTIC) (ciutat_desti "Maldives") (preu_total 3500) (duracio_dies 10))
-
-    ;; VIATGES DE DIVERSIÓ (Família/Amics)
-    (make-instance [v4] of VIATGE (id_viatge "V4") (tipus_viatge DIVERSIO) (ciutat_desti "Orlando") (preu_total 2500) (duracio_dies 10))
-    (make-instance [v5] of VIATGE (id_viatge "V5") (tipus_viatge DIVERSIO) (ciutat_desti "Tenerife") (preu_total 900) (duracio_dies 7))
-    (make-instance [v6] of VIATGE (id_viatge "V6") (tipus_viatge DIVERSIO) (ciutat_desti "Bali") (preu_total 1800) (duracio_dies 12))
-
-    ;; VIATGES CULTURALS (Individual)
-    (make-instance [v7] of VIATGE (id_viatge "V7") (tipus_viatge CULTURAL) (ciutat_desti "Roma") (preu_total 950) (duracio_dies 6))
-    (make-instance [v8] of VIATGE (id_viatge "V8") (tipus_viatge CULTURAL) (ciutat_desti "Londres") (preu_total 1300) (duracio_dies 7))
-    (make-instance [v9] of VIATGE (id_viatge "V9") (tipus_viatge CULTURAL) (ciutat_desti "Berlin") (preu_total 850) (duracio_dies 5))
+    (make-instance [v4] of VIATGE (id_viatge "V4") (tipus_viatge DIVERSIO) (ciutat_desti "Orlando")  (preu_total 2500) (duracio_dies 10))
+    (make-instance [v5] of VIATGE (id_viatge "V5") (tipus_viatge DIVERSIO) (ciutat_desti "Tenerife") (preu_total 900)  (duracio_dies 7))
+    (make-instance [v6] of VIATGE (id_viatge "V6") (tipus_viatge DIVERSIO) (ciutat_desti "Bali")     (preu_total 1800) (duracio_dies 12))
+    (make-instance [v7] of VIATGE (id_viatge "V7") (tipus_viatge CULTURAL) (ciutat_desti "Roma")     (preu_total 950)  (duracio_dies 6))
+    (make-instance [v8] of VIATGE (id_viatge "V8") (tipus_viatge CULTURAL) (ciutat_desti "Londres")  (preu_total 1300) (duracio_dies 7))
+    (make-instance [v9] of VIATGE (id_viatge "V9") (tipus_viatge CULTURAL) (ciutat_desti "Berlin")   (preu_total 850)  (duracio_dies 5))
 )
 
-(defrule RECOMANACIO::genera-dues-propostes
-    ;; Afegim la condició per comprovar que no s'hagin imprès ja
-    (not (propostes-impreses))
+(defrule RECOMANACIO::crea-sols-parcials
+    (declare (salience 20))
+    (object (is-a USUARI) (name [usuari_actual])
+            (objectiu_deduit    ?obj)
+            (dies_max           ?dies-max)
+            (pressupost_max     ?pres)
+            (sacrifica_qualitat ?sacrifica))
+    (object (is-a VIATGE) (name ?v)
+            (tipus_viatge  ?obj)
+            (duracio_dies  ?dur)
+            (preu_total    ?preu))
+    (test (<= ?dur ?dies-max))
+    (test (or (<= ?preu ?pres)
+              (and (eq ?sacrifica TRUE) (<= ?preu (* ?pres 1.25)))))
+    =>
+    (assert (SOLUCIO-PARCIAL (viatges ?v)
+                             (dies_total ?dur)
+                             (cost_total ?preu)))
+)
 
-    (object (is-a USUARI) (name [usuari_actual]) (objectiu_deduit ?obj) (pressupost_max ?pres) (dies_min ?dies-min) (dies_max ?dies-max) (sacrifica_qualitat ?sacrifica))
+(defrule RECOMANACIO::exten-sequencia
+    ;; Mirem si podem afegir element a seq
+    (object (is-a USUARI) (name [usuari_actual])
+            (objectiu_deduit    ?obj)
+            (dies_max           ?dies-max)
+            (ciutats_max        ?ciutats_max)
+            (pressupost_max     ?pres)
+            (sacrifica_qualitat ?sacrifica))
+    (SOLUCIO-PARCIAL (viatges $?vs)
+                     (dies_total ?dies-act)
+                     (cost_total ?cost-act))
+    (object (is-a VIATGE) (name ?v)
+            (tipus_viatge  ?obj)
+            (duracio_dies  ?dur)
+            (preu_total    ?preu))
+    ;; nou element no esta a seq
+    (test (not (member$ ?v ?vs)))
+    ;; per no repetir permutacions ordenem els viatges per ordre
+    ;; de llargada del nom (es pot treure si ens interessa)
+    (test (> (str-compare (str-cat ?v)
+                          (str-cat (nth$ (length$ ?vs) ?vs)))
+             0))
+    ;; preconds de la solució parcial
+    ;; la suma de dies està per sota del màxim
+    (test (<= (+ ?dies-act ?dur) ?dies-max))
+    ;; el cost combinat és assolible
+    (test (or (<= (+ ?cost-act ?preu) ?pres)
+              (and (eq ?sacrifica TRUE)
+                   (<= (+ ?cost-act ?preu) (* ?pres 1.25)))))
+    ;; la seq de viatges (ciutats visitades) esta per sota de max
+    (test (<= (+ (length $?vs) 1) ?ciutats_max))
+    =>
+    (assert (SOLUCIO-PARCIAL
+        (viatges     ?vs ?v)
+        (dies_total  (+ ?dies-act ?dur))
+        (cost_total  (+ ?cost-act ?preu))))
+)
 
-    (object (is-a VIATGE) (name ?v1) (tipus_viatge ?obj) (ciutat_desti ?desti1) (preu_total ?preu1) (duracio_dies ?dur1))
-    (object (is-a VIATGE) (name ?v2) (tipus_viatge ?obj) (ciutat_desti ?desti2) (preu_total ?preu2) (duracio_dies ?dur2))
-
-    (test (neq ?v1 ?v2))
-    (test (neq ?desti1 ?desti2))
-    (test (< (str-compare ?desti1 ?desti2) 0))
-
-    (test (<= ?dur1 ?dies-max))
-    (test (>= ?dur1 ?dies-min))
-    (test (<= ?dur2 ?dies-max))
-    (test (>= ?dur2 ?dies-min))
-
-    (test (or (<= ?preu1 ?pres) (and (eq ?sacrifica TRUE) (<= ?preu1 (* ?pres 1.25)))))
-    (test (or (<= ?preu2 ?pres) (and (eq ?sacrifica TRUE) (<= ?preu2 (* ?pres 1.25)))))
+(defrule RECOMANACIO::imprimeix-text-dalt
+    (declare (salience -3))
+    (not (text-impres))
+    (object (is-a USUARI) (name [usuari_actual])
+            (dies_min        ?dies-min)
+            (dies_max        ?dies-max)
+            (objectiu_deduit ?obj))
+    ;; no imprimeix si no hi ha sol vàlida
+    (SOLUCIO-PARCIAL (dies_total ?dies))
+    (test (>= ?dies ?dies-min))
     =>
     (printout t crlf "==========================================" crlf)
-    (printout t " TENIM 2 PROPOSTES PER A TU (" ?obj "):" crlf)
+    (printout t " SEQÜÈNCIES RECOMANADES (" ?obj "):" crlf)
     (printout t "==========================================" crlf)
+    (assert (text-impres))
+)
 
-    (if (> ?preu1 ?pres) then
-        (printout t " OPCIO 1: " ?desti1 " (" ?dur1 " dies) -> PREU AJUSTAT (Original: " ?preu1 " euros)" crlf)
-    else
-        (printout t " OPCIO 1: " ?desti1 " (" ?dur1 " dies) -> Preu normal: " ?preu1 " euros" crlf)
+(defrule RECOMANACIO::imprimeix-sequencia-valida
+    (declare (salience -5))
+    (object (is-a USUARI) (name [usuari_actual])
+            (dies_min ?dies-min)
+            (ciutats_min ?ciutats-min))
+    (SOLUCIO-PARCIAL (viatges $?vs) (dies_total ?dies) (cost_total ?cost))
+    (test (>= ?dies ?dies-min))
+    (test (>= (length $?vs) ?ciutats-min))
+    =>
+    (printout t crlf "Ruta (" (length$ ?vs) " destins): ")
+    (progn$ (?v ?vs)
+        (printout t (send ?v get-ciutat_desti)
+                    " [" (send ?v get-duracio_dies) "d]")
+        (if (< ?v-index (length$ ?vs)) then
+            (printout t " → "))
     )
-
-    (if (> ?preu2 ?pres) then
-        (printout t " OPCIO 2: " ?desti2 " (" ?dur2 " dies) -> PREU AJUSTAT (Original: " ?preu2 " euros)" crlf)
-    else
-        (printout t " OPCIO 2: " ?desti2 " (" ?dur2 " dies) -> Preu normal: " ?preu2 " euros" crlf)
-    )
-    (printout t "==========================================" crlf)
-
+    (printout t crlf "   Dies total: " ?dies
+                     " | Cost total: " ?cost " €" crlf)
     (assert (solucio-trobada))
-    ;; Marquem que ja hem imprès les propostes per aturar el bucle
-    (assert (propostes-impreses))
 )
 
 (defrule RECOMANACIO::sense-propostes
@@ -201,7 +267,10 @@
     (not (solucio-trobada))
     =>
     (printout t crlf "==========================================" crlf)
-    (printout t " HO SENTIM, CAP VIATGE COMPLEIX LES RESTRICCIONS." crlf)
-    (printout t " Prova d'augmentar el pressupost, els dies, o sacrificar qualitat." crlf)
+    (printout t " HO SENTIM, CAP SEQÜÈNCIA COMPLEIX LES RESTRICCIONS." crlf)
+    (printout t " Prova d'augmentar el pressupost, l'interval de dies," crlf)
+    (printout t " o marca 'sacrifica qualitat'." crlf)
     (printout t "==========================================" crlf)
 )
+
+

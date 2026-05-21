@@ -9,6 +9,8 @@
     (slot perfil_deduit (type SYMBOL) (allowed-values INDIVIDUAL PARELLA FAMILIA GRUP DESCONEGUT) (default DESCONEGUT))
     (slot objectiu_deduit (type SYMBOL) (allowed-values ROMANTIC CULTURAL DESCANS DIVERSIO DESCONEGUT) (default DESCONEGUT))
     (slot rang_edat (type SYMBOL) (allowed-values MENOR JOVE MITJANA-EDAT GRAN))
+    (slot ciutats_min (type INTEGER))
+    (slot ciutats_max (type INTEGER))
 )
 
 (defclass CIUTAT (is-a USER)
