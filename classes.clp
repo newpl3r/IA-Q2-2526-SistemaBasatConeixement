@@ -11,6 +11,9 @@
     (slot rang_edat (type SYMBOL) (allowed-values MENOR JOVE MITJANA-EDAT GRAN))
     (slot ciutats_min (type INTEGER))
     (slot ciutats_max (type INTEGER))
+    (slot dies_ciutats_min (type INTEGER))
+    (slot dies_ciutats_max (type INTEGER))
+    (multislot transport_prohibit (type SYMBOL) (allowed-values TREN AVIO VAIXELL CAP))
 )
 
 (defclass CIUTAT (is-a USER)
@@ -25,4 +28,10 @@
     (slot ciutat_desti (type STRING))
     (slot preu_total (type INTEGER))
     (slot duracio_dies (type INTEGER))
+)
+
+(defclass TRANSPORT (is-a USER)
+    (slot ciutat_origen (type STRING))
+    (slot ciutat_desti (type STRING))
+    (slot tipus_transport (type SYMBOL) (allowed-values TREN AVIO VAIXELL CAP))
 )

@@ -88,6 +88,48 @@
     (send [usuari_actual] put-ciutats_max ?ciutats-max)
 )
 
+(defrule RECOLLIDA-DADES::pregunta-num-dies-ciutats
+    =>
+    (printout t "I quants dies estaries a cada ciutat?" crlf
+    "Com a mínim: ")
+    (bind ?dies-ciutats-min (read))
+    (printout t "Com a màxim: ")
+    (bind ?dies-ciutats-max (read))
+
+    (send [usuari_actual] put-dies_ciutats_min ?dies-ciutats-min)
+    (send [usuari_actual] put-dies_ciutats_max ?dies-ciutats-max)
+)
+
+(defrule RECOLLIDA-DADES::pregunta-transport
+    =>
+    (printout t "Hi ha algun tipus de transporte (avió, vaixell o tren) que no puguis agafar?" crlf)
+    (printout t "Introdueix-los un a un. Escriu 'fi' quan hagis acabat o si no en vols prohibir cap." crlf)
+    
+    (bind $?prohibits (create$))
+    (printout t "Transport prohibit: ")
+    (bind ?resp (read))
+    
+    (while (neq ?resp fi)
+        (bind ?simbol CAP)
+        (if (or (eq ?resp avio) (eq ?resp avió)) then (bind ?simbol AVIO))
+        (if (eq ?resp vaixell)                 then (bind ?simbol VAIXELL))
+        (if (eq ?resp tren)                    then (bind ?simbol TREN))
+        
+        (if (and (neq ?simbol CAP) (not (member$ ?simbol $?prohibits)))
+            then (bind $?prohibits (insert$ $?prohibits (+ (length$ $?prohibits) 1) ?simbol))
+        )
+        
+        (printout t "Algú més? (o 'fi' per acabar): ")
+        (bind ?resp (read))
+    )
+    
+    (if (= (length$ $?prohibits) 0)
+        then (bind $?prohibits (create$ CAP))
+    )
+    
+    (send [usuari_actual] put-transport_prohibit $?prohibits)
+)
+
 (defrule RECOLLIDA-DADES::pregunta-sacrifica-qualitat
     =>
     (printout t "Estaries disposat/da a sacrificar qualitat d'allotjament per estalviar? (si/no): ")
@@ -139,6 +181,7 @@
     (multislot viatges)
     (slot dies_total (default 0))
     (slot cost_total (default 0))
+    (multislot transports)
 )
 
 ;;; --- Càrrega de dades (sense canvis) ---
@@ -164,15 +207,50 @@
     (make-instance [v7] of VIATGE (id_viatge "V7") (tipus_viatge CULTURAL) (ciutat_desti "Roma")     (preu_total 950)  (duracio_dies 6))
     (make-instance [v8] of VIATGE (id_viatge "V8") (tipus_viatge CULTURAL) (ciutat_desti "Londres")  (preu_total 1300) (duracio_dies 7))
     (make-instance [v9] of VIATGE (id_viatge "V9") (tipus_viatge CULTURAL) (ciutat_desti "Berlin")   (preu_total 850)  (duracio_dies 5))
+
+    ;; Rutes des de París
+    (make-instance [t1] of TRANSPORT (ciutat_origen "Paris") (ciutat_desti "Londres") (tipus_transport TREN))
+    (make-instance [t2] of TRANSPORT (ciutat_origen "Paris") (ciutat_desti "Berlin")  (tipus_transport TREN))
+    (make-instance [t3] of TRANSPORT (ciutat_origen "Paris") (ciutat_desti "Roma")    (tipus_transport AVIO))
+    (make-instance [t4] of TRANSPORT (ciutat_origen "Paris") (ciutat_desti "Orlando") (tipus_transport AVIO))
+
+    ;; Rutes des de Roma
+    (make-instance [t5] of TRANSPORT (ciutat_origen "Roma") (ciutat_desti "Venecia") (tipus_transport TREN))
+    (make-instance [t6] of TRANSPORT (ciutat_origen "Roma") (ciutat_desti "Paris")   (tipus_transport TREN))
+    (make-instance [t7] of TRANSPORT (ciutat_origen "Roma") (ciutat_desti "Berlin")  (tipus_transport AVIO))
+    (make-instance [t8] of TRANSPORT (ciutat_origen "Roma") (ciutat_desti "Palma")   (tipus_transport VAIXELL))
+
+    ;; Rutes de connexió a Venècia
+    (make-instance [t9]  of TRANSPORT (ciutat_origen "Venecia") (ciutat_desti "Roma")    (tipus_transport TREN))
+    (make-instance [t10] of TRANSPORT (ciutat_origen "Venecia") (ciutat_desti "Londres")   (tipus_transport VAIXELL))
+
+    ;; Rutes des de Londres
+    (make-instance [t11] of TRANSPORT (ciutat_origen "Londres") (ciutat_desti "Berlin")    (tipus_transport TREN))
+    (make-instance [t12] of TRANSPORT (ciutat_origen "Londres") (ciutat_desti "Tenerife") (tipus_transport AVIO))
+    (make-instance [t13] of TRANSPORT (ciutat_origen "Londres") (ciutat_desti "Maldives") (tipus_transport AVIO))
+
+    ;; Rutes des de Berlín
+    (make-instance [t14] of TRANSPORT (ciutat_origen "Berlin") (ciutat_desti "Paris")   (tipus_transport TREN))
+    (make-instance [t15] of TRANSPORT (ciutat_origen "Berlin") (ciutat_desti "Roma")    (tipus_transport AVIO))
+    (make-instance [t16] of TRANSPORT (ciutat_origen "Berlin") (ciutat_desti "Bali")    (tipus_transport AVIO))
+
+    ;; Rutes de tornada o enllaç des d'illes o intercontinentals
+    (make-instance [t17] of TRANSPORT (ciutat_origen "Tenerife") (ciutat_desti "Madrid")  (tipus_transport AVIO))
+    (make-instance [t18] of TRANSPORT (ciutat_origen "Orlando")  (ciutat_desti "Londres") (tipus_transport AVIO))
+    (make-instance [t19] of TRANSPORT (ciutat_origen "Maldives") (ciutat_desti "Roma")    (tipus_transport AVIO))
+    (make-instance [t20] of TRANSPORT (ciutat_origen "Bali")     (ciutat_desti "Paris")   (tipus_transport AVIO))
+
 )
 
-(defrule RECOMANACIO::crea-sols-parcials
+(defrule RECOMANACIO::crea-seq-un-element
     (declare (salience 20))
     (object (is-a USUARI) (name [usuari_actual])
             (objectiu_deduit    ?obj)
             (dies_max           ?dies-max)
             (pressupost_max     ?pres)
-            (sacrifica_qualitat ?sacrifica))
+            (sacrifica_qualitat ?sacrifica)
+            (dies_ciutats_min   ?dies_ciutats_min)
+            (dies_ciutats_max   ?dies_ciutats_max))
     (object (is-a VIATGE) (name ?v)
             (tipus_viatge  ?obj)
             (duracio_dies  ?dur)
@@ -180,10 +258,13 @@
     (test (<= ?dur ?dies-max))
     (test (or (<= ?preu ?pres)
               (and (eq ?sacrifica TRUE) (<= ?preu (* ?pres 1.25)))))
+    (test (<= ?dur ?dies_ciutats_max))
+    (test (>= ?dur ?dies_ciutats_min))
     =>
     (assert (SOLUCIO-PARCIAL (viatges ?v)
                              (dies_total ?dur)
-                             (cost_total ?preu)))
+                             (cost_total ?preu)
+                             (transports (create$))))
 )
 
 (defrule RECOMANACIO::exten-sequencia
@@ -192,22 +273,42 @@
             (objectiu_deduit    ?obj)
             (dies_max           ?dies-max)
             (ciutats_max        ?ciutats_max)
+            (dies_ciutats_min   ?dies_ciutats_min)
+            (dies_ciutats_max   ?dies_ciutats_max)
             (pressupost_max     ?pres)
-            (sacrifica_qualitat ?sacrifica))
+            (sacrifica_qualitat ?sacrifica)
+            (transport_prohibit $?trans_prohibit))
+
     (SOLUCIO-PARCIAL (viatges $?vs)
                      (dies_total ?dies-act)
-                     (cost_total ?cost-act))
+                     (cost_total ?cost-act)
+                     (transports $?ts))
+
+    (object (is-a VIATGE) (name ?ultim_viatge) (ciutat_desti ?ciutat_origen))
+    (test (eq ?ultim_viatge (nth$ (length$ $?vs) $?vs)))
+
     (object (is-a VIATGE) (name ?v)
             (tipus_viatge  ?obj)
             (duracio_dies  ?dur)
-            (preu_total    ?preu))
+            (preu_total    ?preu)
+            (ciutat_desti ?ciutat_desti))
+
+    ;; assegurem que existeix transport que conecti ciutats
+    (object (is-a TRANSPORT)
+            (name ?id_transport)
+            (ciutat_origen ?ciutat_origen)
+            (ciutat_desti ?ciutat_desti)
+            (tipus_transport ?tipus_transport))
+
+    (test (not (member$ ?tipus_transport $?trans_prohibit)))
+    
     ;; nou element no esta a seq
     (test (not (member$ ?v ?vs)))
     ;; per no repetir permutacions ordenem els viatges per ordre
     ;; de llargada del nom (es pot treure si ens interessa)
-    (test (> (str-compare (str-cat ?v)
-                          (str-cat (nth$ (length$ ?vs) ?vs)))
-             0))
+    ;;(test (> (str-compare (str-cat ?v)
+    ;;                      (str-cat (nth$ (length$ ?vs) $?vs)))
+    ;;         0))
     ;; preconds de la solució parcial
     ;; la suma de dies està per sota del màxim
     (test (<= (+ ?dies-act ?dur) ?dies-max))
@@ -216,12 +317,16 @@
               (and (eq ?sacrifica TRUE)
                    (<= (+ ?cost-act ?preu) (* ?pres 1.25)))))
     ;; la seq de viatges (ciutats visitades) esta per sota de max
-    (test (<= (+ (length $?vs) 1) ?ciutats_max))
+    (test (<= (+ (length$ $?vs) 1) ?ciutats_max))
+    ;; la parada a la ciutat es coherent amb el rang dels dies per ciutat
+    (test (<= ?dur ?dies_ciutats_max))
+    (test (>= ?dur ?dies_ciutats_min))
     =>
     (assert (SOLUCIO-PARCIAL
-        (viatges     ?vs ?v)
+        (viatges     $?vs ?v)
         (dies_total  (+ ?dies-act ?dur))
-        (cost_total  (+ ?cost-act ?preu))))
+        (cost_total  (+ ?cost-act ?preu))
+        (transports  $?ts ?id_transport)))
 )
 
 (defrule RECOMANACIO::imprimeix-text-dalt
@@ -236,7 +341,7 @@
     (test (>= ?dies ?dies-min))
     =>
     (printout t crlf "==========================================" crlf)
-    (printout t " SEQÜÈNCIES RECOMANADES (" ?obj "):" crlf)
+    (printout t " ITINERARIS RECOMANATS (" ?obj "):" crlf)
     (printout t "==========================================" crlf)
     (assert (text-impres))
 )
@@ -245,29 +350,62 @@
     (declare (salience -5))
     (object (is-a USUARI) (name [usuari_actual])
             (dies_min ?dies-min)
-            (ciutats_min ?ciutats-min))
-    (SOLUCIO-PARCIAL (viatges $?vs) (dies_total ?dies) (cost_total ?cost))
+            (ciutats_min ?ciutats-min)
+            (pressupost_max ?pres)
+            (sacrifica_qualitat ?sacrifica))
+    (SOLUCIO-PARCIAL 
+        (viatges $?vs) 
+        (dies_total ?dies) 
+        (cost_total ?cost)
+        (transports $?ts))
     (test (>= ?dies ?dies-min))
     (test (>= (length $?vs) ?ciutats-min))
     =>
     (printout t crlf "Ruta (" (length$ ?vs) " destins): ")
+    ;; progn -> es repeteixen les inst del bloc 1 cop per element llista
     (progn$ (?v ?vs)
         (printout t (send ?v get-ciutat_desti)
                     " [" (send ?v get-duracio_dies) "d]")
         (if (< ?v-index (length$ ?vs)) then
             (printout t " → "))
     )
-    (printout t crlf "   Dies total: " ?dies
-                     " | Cost total: " ?cost " €" crlf)
+    (if (<= ?cost ?pres)then
+        (printout t crlf "   Dies total: " ?dies
+                        " | Preu total: " ?cost " €" crlf)
+    else (if (and (eq ?sacrifica TRUE)
+                   (<= ?cost (* ?pres 1.25))) then
+        (printout t crlf "   Dies total: " ?dies
+                        " | PREU AJUSTAT: " ?cost " €" crlf)
+    )
+    )
+
+    (if (> (length$ ?ts) 0) then
+        (printout t "   Transports: ")
+        (bind ?idx 1)
+        (progn$ (?transport ?ts)
+            (printout t (send ?transport get-ciutat_origen) 
+            "-" (send ?transport get-ciutat_desti) 
+            ": " (send ?transport get-tipus_transport))
+            (if (< ?idx (length$ ?ts)) then (printout t " → "))
+            (bind ?idx (+ ?idx 1))
+        )
+        (printout t crlf)
+    )
+
     (assert (solucio-trobada))
 )
+
+(defrule RECOMANACIO::prova-transports
+    (object (is-a TRANSPORT) (ciutat_origen "Londres") (ciutat_desti "Berlin"))
+    =>
+    (printout t "Transport Londres->Berlin trobat!" crlf))
 
 (defrule RECOMANACIO::sense-propostes
     (declare (salience -10))
     (not (solucio-trobada))
     =>
     (printout t crlf "==========================================" crlf)
-    (printout t " HO SENTIM, CAP SEQÜÈNCIA COMPLEIX LES RESTRICCIONS." crlf)
+    (printout t " HO SENTIM, CAP ITINERARI COMPLEIX LES RESTRICCIONS." crlf)
     (printout t " Prova d'augmentar el pressupost, l'interval de dies," crlf)
     (printout t " o marca 'sacrifica qualitat'." crlf)
     (printout t "==========================================" crlf)
