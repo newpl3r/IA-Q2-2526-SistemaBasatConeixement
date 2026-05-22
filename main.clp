@@ -182,12 +182,13 @@
     (slot dies_total (default 0))
     (slot cost_total (default 0))
     (multislot transports)
+    (multislot atraccions)
 )
 
 ;;; --- Càrrega de dades (sense canvis) ---
 (defrule RECOMANACIO::carrega-dades
     (declare (salience 50))
-    =>
+    =>    
     (make-instance [c1] of CIUTAT (nom "Paris")    (tematica EUROPEA_GRAN)  (cost_diari_estimat 150))
     (make-instance [c2] of CIUTAT (nom "Roma")     (tematica MEDITERRANIA)  (cost_diari_estimat 120))
     (make-instance [c3] of CIUTAT (nom "Venecia")  (tematica MEDITERRANIA)  (cost_diari_estimat 160))
@@ -198,15 +199,51 @@
     (make-instance [c8] of CIUTAT (nom "Berlin")   (tematica EUROPEA_GRAN)  (cost_diari_estimat 110))
     (make-instance [c9] of CIUTAT (nom "Bali")     (tematica NATURALESA)    (cost_diari_estimat 80))
 
-    (make-instance [v1] of VIATGE (id_viatge "V1") (tipus_viatge ROMANTIC) (ciutat_desti "Paris")    (preu_total 1200) (duracio_dies 7))
-    (make-instance [v2] of VIATGE (id_viatge "V2") (tipus_viatge ROMANTIC) (ciutat_desti "Venecia")  (preu_total 1400) (duracio_dies 5))
-    (make-instance [v3] of VIATGE (id_viatge "V3") (tipus_viatge ROMANTIC) (ciutat_desti "Maldives") (preu_total 3500) (duracio_dies 10))
-    (make-instance [v4] of VIATGE (id_viatge "V4") (tipus_viatge DIVERSIO) (ciutat_desti "Orlando")  (preu_total 2500) (duracio_dies 10))
-    (make-instance [v5] of VIATGE (id_viatge "V5") (tipus_viatge DIVERSIO) (ciutat_desti "Tenerife") (preu_total 900)  (duracio_dies 7))
-    (make-instance [v6] of VIATGE (id_viatge "V6") (tipus_viatge DIVERSIO) (ciutat_desti "Bali")     (preu_total 1800) (duracio_dies 12))
-    (make-instance [v7] of VIATGE (id_viatge "V7") (tipus_viatge CULTURAL) (ciutat_desti "Roma")     (preu_total 950)  (duracio_dies 6))
-    (make-instance [v8] of VIATGE (id_viatge "V8") (tipus_viatge CULTURAL) (ciutat_desti "Londres")  (preu_total 1300) (duracio_dies 7))
-    (make-instance [v9] of VIATGE (id_viatge "V9") (tipus_viatge CULTURAL) (ciutat_desti "Berlin")   (preu_total 850)  (duracio_dies 5))
+    ;; París
+    (make-instance [a1]  of ATRACCIO (nom "Torre Eiffel")       (ciutat [c1]) (duracio 1.0))
+    (make-instance [a2]  of ATRACCIO (nom "Museu del Louvre")   (ciutat [c1]) (duracio 1.0))
+    (make-instance [a3]  of ATRACCIO (nom "Notre-Dame")         (ciutat [c1]) (duracio 0.5))
+    ;; Roma
+    (make-instance [a4]  of ATRACCIO (nom "Coliseu")            (ciutat [c2]) (duracio 1.0))
+    (make-instance [a5]  of ATRACCIO (nom "Fontana di Trevi")   (ciutat [c2]) (duracio 0.5))
+    (make-instance [a6]  of ATRACCIO (nom "Vaticà")             (ciutat [c2]) (duracio 2.0))
+    ;; Venècia
+    (make-instance [a7]  of ATRACCIO (nom "Canal Gran")         (ciutat [c3]) (duracio 0.5))
+    (make-instance [a8]  of ATRACCIO (nom "Plaça de Sant Marc") (ciutat [c3]) (duracio 0.5))
+    (make-instance [a9]  of ATRACCIO (nom "Pont de Rialto")     (ciutat [c3]) (duracio 0.5))
+    ;; Orlando
+    (make-instance [a10] of ATRACCIO (nom "Walt Disney World")  (ciutat [c4]) (duracio 2.0))
+    (make-instance [a11] of ATRACCIO (nom "Universal Studios")  (ciutat [c4]) (duracio 1.0))
+    ;; Tenerife
+    (make-instance [a12] of ATRACCIO (nom "Teide")              (ciutat [c5]) (duracio 1.0))
+    (make-instance [a13] of ATRACCIO (nom "Loro Parque")        (ciutat [c5]) (duracio 1.0))
+    (make-instance [a14] of ATRACCIO (nom "Siam Park")          (ciutat [c5]) (duracio 1.0))
+    ;; Maldives
+    (make-instance [a15] of ATRACCIO (nom "Atòl de Malé")       (ciutat [c6]) (duracio 0.5))
+    (make-instance [a16] of ATRACCIO (nom "Esculls de corall")  (ciutat [c6]) (duracio 0.5))
+    (make-instance [a17] of ATRACCIO (nom "Platges de sorra blanca") (ciutat [c6]) (duracio 1.0))
+    ;; Londres
+    (make-instance [a18] of ATRACCIO (nom "Big Ben")            (ciutat [c7]) (duracio 0.5))
+    (make-instance [a19] of ATRACCIO (nom "London Eye")         (ciutat [c7]) (duracio 0.5))
+    (make-instance [a20] of ATRACCIO (nom "British Museum")     (ciutat [c7]) (duracio 2.0))
+    ;; Berlín
+    (make-instance [a21] of ATRACCIO (nom "Porta de Brandenburg") (ciutat [c8]) (duracio 0.5))
+    (make-instance [a22] of ATRACCIO (nom "Mur de Berlín")      (ciutat [c8]) (duracio 1.0))
+    (make-instance [a23] of ATRACCIO (nom "Illa dels Museus")   (ciutat [c8]) (duracio 2.0))
+    ;; Bali
+    (make-instance [a24] of ATRACCIO (nom "Temple d'Uluwatu")   (ciutat [c9]) (duracio 1.0))
+    (make-instance [a25] of ATRACCIO (nom "Camps d'arròs d'Ubud") (ciutat [c9]) (duracio 0.5))
+    (make-instance [a26] of ATRACCIO (nom "Tanah Lot")          (ciutat [c9]) (duracio 0.5))
+
+    (make-instance [v1] of VIATGE (id_viatge "V1") (tipus_viatge ROMANTIC) (ciutat_desti [c1]) (preu_total 1200) (duracio_dies 7))
+    (make-instance [v2] of VIATGE (id_viatge "V2") (tipus_viatge ROMANTIC) (ciutat_desti [c3]) (preu_total 1400) (duracio_dies 5))
+    (make-instance [v3] of VIATGE (id_viatge "V3") (tipus_viatge ROMANTIC) (ciutat_desti [c6]) (preu_total 3500) (duracio_dies 10))
+    (make-instance [v4] of VIATGE (id_viatge "V4") (tipus_viatge DIVERSIO) (ciutat_desti [c4]) (preu_total 2500) (duracio_dies 10))
+    (make-instance [v5] of VIATGE (id_viatge "V5") (tipus_viatge DIVERSIO) (ciutat_desti [c5]) (preu_total 900)  (duracio_dies 7))
+    (make-instance [v6] of VIATGE (id_viatge "V6") (tipus_viatge DIVERSIO) (ciutat_desti [c9]) (preu_total 1800) (duracio_dies 12))
+    (make-instance [v7] of VIATGE (id_viatge "V7") (tipus_viatge CULTURAL) (ciutat_desti [c2]) (preu_total 950)  (duracio_dies 2))
+    (make-instance [v8] of VIATGE (id_viatge "V8") (tipus_viatge CULTURAL) (ciutat_desti [c7]) (preu_total 1300) (duracio_dies 7))
+    (make-instance [v9] of VIATGE (id_viatge "V9") (tipus_viatge CULTURAL) (ciutat_desti [c8]) (preu_total 850)  (duracio_dies 5))
 
     ;; Rutes des de París
     (make-instance [t1] of TRANSPORT (ciutat_origen "Paris") (ciutat_desti "Londres") (tipus_transport TREN))
@@ -239,7 +276,22 @@
     (make-instance [t18] of TRANSPORT (ciutat_origen "Orlando")  (ciutat_desti "Londres") (tipus_transport AVIO))
     (make-instance [t19] of TRANSPORT (ciutat_origen "Maldives") (ciutat_desti "Roma")    (tipus_transport AVIO))
     (make-instance [t20] of TRANSPORT (ciutat_origen "Bali")     (ciutat_desti "Paris")   (tipus_transport AVIO))
+)
 
+;; Selecciona totes les atraccions que capiguen en els dies disponibles
+(deffunction selecciona-atraccions-ciutat (?ciutat ?dies_disponibles)
+    (bind $?atraccions (send ?ciutat get-atraccions))
+    (bind ?seleccionades (create$))
+    (bind ?dies_usats 0)
+    (do-for-all-instances ((?a ATRACCIO))
+        (eq (send ?a get-ciutat) ?ciutat)
+        (bind ?dur (send ?a get-duracio))
+        (if (<= (+ ?dies_usats ?dur) ?dies_disponibles) then
+            (bind ?seleccionades (create$ ?seleccionades (instance-name ?a)))
+            (bind ?dies_usats (+ ?dies_usats ?dur))
+        )
+    )
+    ?seleccionades
 )
 
 (defrule RECOMANACIO::crea-seq-un-element
@@ -254,17 +306,20 @@
     (object (is-a VIATGE) (name ?v)
             (tipus_viatge  ?obj)
             (duracio_dies  ?dur)
-            (preu_total    ?preu))
+            (preu_total    ?preu)
+            (ciutat_desti  ?ciutat_desti))
     (test (<= ?dur ?dies-max))
     (test (or (<= ?preu ?pres)
               (and (eq ?sacrifica TRUE) (<= ?preu (* ?pres 1.25)))))
     (test (<= ?dur ?dies_ciutats_max))
     (test (>= ?dur ?dies_ciutats_min))
     =>
+    (bind ?atraccions (selecciona-atraccions-ciutat ?ciutat_desti ?dur))
     (assert (SOLUCIO-PARCIAL (viatges ?v)
                              (dies_total ?dur)
                              (cost_total ?preu)
-                             (transports (create$))))
+                             (transports (create$))
+                             (atraccions ?atraccions)))
 )
 
 (defrule RECOMANACIO::exten-sequencia
@@ -282,7 +337,8 @@
     (SOLUCIO-PARCIAL (viatges $?vs)
                      (dies_total ?dies-act)
                      (cost_total ?cost-act)
-                     (transports $?ts))
+                     (transports $?ts)
+                     (atraccions $?as))
 
     (object (is-a VIATGE) (name ?ultim_viatge) (ciutat_desti ?ciutat_origen))
     (test (eq ?ultim_viatge (nth$ (length$ $?vs) $?vs)))
@@ -296,37 +352,40 @@
     ;; assegurem que existeix transport que conecti ciutats
     (object (is-a TRANSPORT)
             (name ?id_transport)
-            (ciutat_origen ?ciutat_origen)
-            (ciutat_desti ?ciutat_desti)
+            (ciutat_origen ?id_origen)
+            (ciutat_desti ?id_desti)
             (tipus_transport ?tipus_transport))
+    (test (eq (send ?ciutat_origen get-nom) ?id_origen))
+    (test (eq (send ?ciutat_desti get-nom) ?id_desti))
 
     (test (not (member$ ?tipus_transport $?trans_prohibit)))
     
     ;; nou element no esta a seq
     (test (not (member$ ?v ?vs)))
-    ;; per no repetir permutacions ordenem els viatges per ordre
-    ;; de llargada del nom (es pot treure si ens interessa)
-    ;;(test (> (str-compare (str-cat ?v)
-    ;;                      (str-cat (nth$ (length$ ?vs) $?vs)))
-    ;;         0))
-    ;; preconds de la solució parcial
+    
     ;; la suma de dies està per sota del màxim
     (test (<= (+ ?dies-act ?dur) ?dies-max))
+
     ;; el cost combinat és assolible
     (test (or (<= (+ ?cost-act ?preu) ?pres)
               (and (eq ?sacrifica TRUE)
                    (<= (+ ?cost-act ?preu) (* ?pres 1.25)))))
+    
     ;; la seq de viatges (ciutats visitades) esta per sota de max
     (test (<= (+ (length$ $?vs) 1) ?ciutats_max))
+    
     ;; la parada a la ciutat es coherent amb el rang dels dies per ciutat
     (test (<= ?dur ?dies_ciutats_max))
     (test (>= ?dur ?dies_ciutats_min))
     =>
+    (bind ?atraccio (selecciona-atraccions-ciutat ?ciutat_desti ?dur))
     (assert (SOLUCIO-PARCIAL
         (viatges     $?vs ?v)
         (dies_total  (+ ?dies-act ?dur))
         (cost_total  (+ ?cost-act ?preu))
-        (transports  $?ts ?id_transport)))
+        (transports  $?ts ?id_transport)
+        (atraccions $?as $?atraccio))
+    )
 )
 
 (defrule RECOMANACIO::imprimeix-text-dalt
@@ -357,18 +416,44 @@
         (viatges $?vs) 
         (dies_total ?dies) 
         (cost_total ?cost)
-        (transports $?ts))
+        (transports $?ts)
+        (atraccions $?as))
     (test (>= ?dies ?dies-min))
     (test (>= (length $?vs) ?ciutats-min))
     =>
     (printout t crlf "Ruta (" (length$ ?vs) " destins): ")
+    ;; Imprimir ciutats
     ;; progn -> es repeteixen les inst del bloc 1 cop per element llista
     (progn$ (?v ?vs)
-        (printout t (send ?v get-ciutat_desti)
-                    " [" (send ?v get-duracio_dies) "d]")
+        (bind ?ciutat (send ?v get-ciutat_desti))
+        (printout t (send ?ciutat get-nom) " [" (send ?v get-duracio_dies) "d]")
         (if (< ?v-index (length$ ?vs)) then
             (printout t " → "))
     )
+    ;; Imprimir atraccions 
+    (printout t crlf "   Visites: ")
+    (progn$ (?v ?vs)
+        (bind ?ciutat (send ?v get-ciutat_desti))
+        
+        ;; Subcadena de as (de la ciutat)
+        (bind ?as_ciutat (create$))
+        (progn$ (?a ?as)
+            (if (eq (send ?a get-ciutat) ?ciutat) then
+                (bind ?as_ciutat (create$ ?as_ciutat ?a)))
+        )
+
+        (printout t crlf "     · " (send ?ciutat get-nom) ": ")
+        (if (> (length$ ?as_ciutat) 0) then        
+            (progn$ (?a $?as_ciutat)
+                (printout t (send ?a get-nom))
+                (if (< ?a-index (length$ $?as_ciutat)) then
+                    (printout t ", "))
+            )
+        else
+            (printout t "(sense visites)")
+        )
+    )
+    ;; Imprimir cost i dies
     (if (<= ?cost ?pres)then
         (printout t crlf "   Dies total: " ?dies
                         " | Preu total: " ?cost " €" crlf)
@@ -378,7 +463,7 @@
                         " | PREU AJUSTAT: " ?cost " €" crlf)
     )
     )
-
+    ;; Imprimir transport
     (if (> (length$ ?ts) 0) then
         (printout t "   Transports: ")
         (bind ?idx 1)
@@ -394,11 +479,6 @@
 
     (assert (solucio-trobada))
 )
-
-(defrule RECOMANACIO::prova-transports
-    (object (is-a TRANSPORT) (ciutat_origen "Londres") (ciutat_desti "Berlin"))
-    =>
-    (printout t "Transport Londres->Berlin trobat!" crlf))
 
 (defrule RECOMANACIO::sense-propostes
     (declare (salience -10))
