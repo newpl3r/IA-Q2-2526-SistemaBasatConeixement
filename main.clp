@@ -41,6 +41,16 @@
     ))))
 )
 
+(defrule RECOLLIDA-DADES::pregunta-persones
+    =>
+    (printout t "Quantes persones voldreu viatjar? ")
+    (bind ?resp (read))
+    (if (eq ?resp 1) then
+        (send [usuari_actual] put-perfil_deduit INDIVIDUAL)
+    )
+    (send [usuari_actual] put-persones_viatjant ?resp)
+)
+
 (defrule RECOLLIDA-DADES::pregunta-pressupost
     =>
     (printout t "Quin es el teu pressupost maxim aproximat (en euros)? ")
@@ -62,18 +72,31 @@
 
 (defrule RECOLLIDA-DADES::pregunta-grup
     =>
-    (printout t "Viatges sol, en parella, en familia o amb amics? (individual/parella/familia/amics): ")
-    (bind ?resp (read))
-    (if (eq ?resp familia) then
-        (send [usuari_actual] put-perfil_deduit FAMILIA)
-        (send [usuari_actual] put-viatja_amb_nens TRUE)
-    else (if (eq ?resp parella) then
-        (send [usuari_actual] put-perfil_deduit PARELLA)
-    else (if (eq ?resp individual) then
-        (send [usuari_actual] put-perfil_deduit INDIVIDUAL)
-    else (if (eq ?resp amics) then
-        (send [usuari_actual] put-perfil_deduit GRUP)
-    ))))
+    (bind ?n_persones (send [usuari_actual] get-persones_viatjant))
+    (if (eq ?n_persones 2) then
+        (printout t "Viatges amb la teva parella (si/no): ")
+        (bind ?resp (read))
+        (if (eq ?resp si) then
+            (send [usuari_actual] put-perfil_deduit PARELLA)
+        else
+            (send [usuari_actual] put-perfil_deduit GRUP)
+        )
+        
+    )
+    (if (> ?n_persones 2) then
+        (printout t "Viatges en familia o amb amics? (familia/amics): ")
+        (bind ?resp (read))
+        (if (eq ?resp familia) then
+            (send [usuari_actual] put-perfil_deduit FAMILIA)
+            (send [usuari_actual] put-viatja_amb_nens TRUE)
+        else (if (eq ?resp parella) then
+            (send [usuari_actual] put-perfil_deduit PARELLA)
+        else (if (eq ?resp individual) then
+            (send [usuari_actual] put-perfil_deduit INDIVIDUAL)
+        else (if (eq ?resp amics) then
+            (send [usuari_actual] put-perfil_deduit GRUP)
+        ))))
+    )
 )
 
 (defrule RECOLLIDA-DADES::pregunta-num-ciutats
@@ -313,6 +336,7 @@
 (defrule RECOMANACIO::crea-seq-un-element
     (declare (salience 20))
     (object (is-a USUARI) (name [usuari_actual])
+            (persones_viatjant  ?n_persones)
             (objectiu_deduit    ?obj)
             (dies_max           ?dies-max)
             (pressupost_max     ?pres)
@@ -335,7 +359,7 @@
             (bind $?atraccions-i-preu (selecciona-atraccions-ciutat ?ciutat_desti ?dur))
             (bind ?preu_atraccions (nth$ 1 $?atraccions-i-preu))
             (bind $?atraccions (rest$ $?atraccions-i-preu))
-            (bind ?preu_total (+ (* ?preu_allotjament ?dur) ?preu_atraccions))
+            (bind ?preu_total (* ?n_persones (+ (* ?preu_allotjament ?dur) ?preu_atraccions)))
             
             ;; Comprovem el preu aquí perquè necessitem preu_atraccions
             (if (or (<= ?preu_total ?pres)
@@ -356,6 +380,7 @@
 (defrule RECOMANACIO::exten-sequencia
     ;; Mirem si podem afegir element a seq
     (object (is-a USUARI) (name [usuari_actual])
+            (persones_viatjant  ?n_persones)
             (objectiu_deduit    ?obj)
             (dies_max           ?dies-max)
             (ciutats_max        ?ciutats_max)
@@ -411,7 +436,7 @@
             (bind $?atraccions-i-preu (selecciona-atraccions-ciutat ?ciutat_desti ?dur))
             (bind ?preu_atraccions (nth$ 1 $?atraccions-i-preu))
             (bind $?atraccions (rest$ $?atraccions-i-preu))
-            (bind ?preu_total (+ (* ?preu_allotjament ?dur) ?preu_atraccions ?preu_transport))
+            (bind ?preu_total (* ?n_persones (+ (* ?preu_allotjament ?dur) ?preu_atraccions ?preu_transport)))
             
             ;; Comprovem el preu aquí perquè necessitem preu_atraccions
             (if (or (<= (+ ?cost_total ?preu_total) ?pres)

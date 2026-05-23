@@ -1,6 +1,7 @@
 ;;; Definició de les classes principals basades en l'ontologia
 
 (defclass USUARI (is-a USER)
+    (slot persones_viatjant (type INTEGER))
     (slot pressupost_max (type INTEGER))
     (slot dies_min (type INTEGER))
     (slot dies_max (type INTEGER))
