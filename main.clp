@@ -183,58 +183,80 @@
     (slot cost_total (default 0))
     (multislot transports)
     (multislot atraccions)
+    (multislot allotjaments)
 )
 
 ;;; --- Càrrega de dades (sense canvis) ---
 (defrule RECOMANACIO::carrega-dades
     (declare (salience 50))
     =>    
-    (make-instance [c1] of CIUTAT (nom "Paris")    (tematica EUROPEA_GRAN)  (cost_diari_estimat 150))
-    (make-instance [c2] of CIUTAT (nom "Roma")     (tematica MEDITERRANIA)  (cost_diari_estimat 120))
-    (make-instance [c3] of CIUTAT (nom "Venecia")  (tematica MEDITERRANIA)  (cost_diari_estimat 160))
-    (make-instance [c4] of CIUTAT (nom "Orlando")  (tematica DIVERSIO)      (cost_diari_estimat 200))
-    (make-instance [c5] of CIUTAT (nom "Tenerife") (tematica DIVERSIO)      (cost_diari_estimat 90))
-    (make-instance [c6] of CIUTAT (nom "Maldives") (tematica NATURALESA)    (cost_diari_estimat 300))
-    (make-instance [c7] of CIUTAT (nom "Londres")  (tematica EUROPEA_GRAN)  (cost_diari_estimat 180))
-    (make-instance [c8] of CIUTAT (nom "Berlin")   (tematica EUROPEA_GRAN)  (cost_diari_estimat 110))
-    (make-instance [c9] of CIUTAT (nom "Bali")     (tematica NATURALESA)    (cost_diari_estimat 80))
+    (make-instance [c1] of CIUTAT (nom "Paris")    (tematica EUROPEA_GRAN))
+    (make-instance [c2] of CIUTAT (nom "Roma")     (tematica MEDITERRANIA))
+    (make-instance [c3] of CIUTAT (nom "Venecia")  (tematica MEDITERRANIA))
+    (make-instance [c4] of CIUTAT (nom "Orlando")  (tematica DIVERSIO))
+    (make-instance [c5] of CIUTAT (nom "Tenerife") (tematica DIVERSIO))
+    (make-instance [c6] of CIUTAT (nom "Maldives") (tematica NATURALESA))
+    (make-instance [c7] of CIUTAT (nom "Londres")  (tematica EUROPEA_GRAN))
+    (make-instance [c8] of CIUTAT (nom "Berlin")   (tematica EUROPEA_GRAN))
+    (make-instance [c9] of CIUTAT (nom "Bali")     (tematica NATURALESA))
+
+    (make-instance [h1] of ALLOTJAMENT (nom "PA") (ciutat [c1]) (estrelles 4) (preu_nit 120))
+    (make-instance [h2] of ALLOTJAMENT (nom "PA") (ciutat [c1]) (estrelles 2) (preu_nit 65))
+    (make-instance [h3] of ALLOTJAMENT (nom "PA") (ciutat [c1]) (estrelles 5) (preu_nit 200))
+    (make-instance [h4] of ALLOTJAMENT (nom "RA") (ciutat [c2]) (estrelles 3) (preu_nit 80))
+    (make-instance [h5] of ALLOTJAMENT (nom "RA") (ciutat [c2]) (estrelles 4) (preu_nit 110))
+    (make-instance [h6] of ALLOTJAMENT (nom "VA") (ciutat [c3]) (estrelles 3) (preu_nit 95))
+    (make-instance [h7] of ALLOTJAMENT (nom "VA") (ciutat [c3]) (estrelles 5) (preu_nit 210))
+    (make-instance [h8] of ALLOTJAMENT (nom "OA") (ciutat [c4]) (estrelles 3) (preu_nit 100))
+    (make-instance [h9] of ALLOTJAMENT (nom "OA") (ciutat [c4]) (estrelles 4) (preu_nit 140))
+    (make-instance [h10] of ALLOTJAMENT (nom "TA") (ciutat [c5]) (estrelles 2) (preu_nit 45))
+    (make-instance [h11] of ALLOTJAMENT (nom "TA") (ciutat [c5]) (estrelles 4) (preu_nit 85))
+    (make-instance [h12] of ALLOTJAMENT (nom "MA") (ciutat [c6]) (estrelles 5) (preu_nit 250))
+    (make-instance [h13] of ALLOTJAMENT (nom "MA") (ciutat [c6]) (estrelles 3) (preu_nit 130))
+    (make-instance [h14] of ALLOTJAMENT (nom "LA") (ciutat [c7]) (estrelles 3) (preu_nit 105))
+    (make-instance [h15] of ALLOTJAMENT (nom "LA") (ciutat [c7]) (estrelles 4) (preu_nit 150))
+    (make-instance [h16] of ALLOTJAMENT (nom "LA") (ciutat [c7]) (estrelles 2) (preu_nit 70))
+    (make-instance [h17] of ALLOTJAMENT (nom "BA") (ciutat [c8]) (estrelles 3) (preu_nit 70))
+    (make-instance [h18] of ALLOTJAMENT (nom "BA") (ciutat [c8]) (estrelles 1) (preu_nit 35))
+    (make-instance [h19] of ALLOTJAMENT (nom "BA") (ciutat [c9]) (estrelles 4) (preu_nit 65))
+    (make-instance [h20] of ALLOTJAMENT (nom "BA") (ciutat [c9]) (estrelles 2) (preu_nit 30))
 
     ;; París
-    (make-instance [a1]  of ATRACCIO (nom "Torre Eiffel")       (ciutat [c1]) (duracio 1.0))
-    (make-instance [a2]  of ATRACCIO (nom "Museu del Louvre")   (ciutat [c1]) (duracio 1.0))
-    (make-instance [a3]  of ATRACCIO (nom "Notre-Dame")         (ciutat [c1]) (duracio 0.5))
+    (make-instance [a1]  of ATRACCIO (nom "Torre Eiffel")       (ciutat [c1]) (duracio 1.0) (preu_atraccio 25))
+    (make-instance [a2]  of ATRACCIO (nom "Museu del Louvre")   (ciutat [c1]) (duracio 1.0) (preu_atraccio 17))
+    (make-instance [a3]  of ATRACCIO (nom "Notre-Dame")         (ciutat [c1]) (duracio 0.5) (preu_atraccio 0))
     ;; Roma
-    (make-instance [a4]  of ATRACCIO (nom "Coliseu")            (ciutat [c2]) (duracio 1.0))
-    (make-instance [a5]  of ATRACCIO (nom "Fontana di Trevi")   (ciutat [c2]) (duracio 0.5))
-    (make-instance [a6]  of ATRACCIO (nom "Vaticà")             (ciutat [c2]) (duracio 2.0))
+    (make-instance [a4]  of ATRACCIO (nom "Coliseu")            (ciutat [c2]) (duracio 1.0) (preu_atraccio 16))
+    (make-instance [a5]  of ATRACCIO (nom "Fontana di Trevi")   (ciutat [c2]) (duracio 0.5) (preu_atraccio 0))
+    (make-instance [a6]  of ATRACCIO (nom "Vaticà")             (ciutat [c2]) (duracio 2.0) (preu_atraccio 17))
     ;; Venècia
-    (make-instance [a7]  of ATRACCIO (nom "Canal Gran")         (ciutat [c3]) (duracio 0.5))
-    (make-instance [a8]  of ATRACCIO (nom "Plaça de Sant Marc") (ciutat [c3]) (duracio 0.5))
-    (make-instance [a9]  of ATRACCIO (nom "Pont de Rialto")     (ciutat [c3]) (duracio 0.5))
+    (make-instance [a7]  of ATRACCIO (nom "Canal Gran")         (ciutat [c3]) (duracio 0.5) (preu_atraccio 0))
+    (make-instance [a8]  of ATRACCIO (nom "Plaça de Sant Marc") (ciutat [c3]) (duracio 0.5) (preu_atraccio 0))
+    (make-instance [a9]  of ATRACCIO (nom "Pont de Rialto")     (ciutat [c3]) (duracio 0.5) (preu_atraccio 0))
     ;; Orlando
-    (make-instance [a10] of ATRACCIO (nom "Walt Disney World")  (ciutat [c4]) (duracio 2.0))
-    (make-instance [a11] of ATRACCIO (nom "Universal Studios")  (ciutat [c4]) (duracio 1.0))
+    (make-instance [a10] of ATRACCIO (nom "Walt Disney World")  (ciutat [c4]) (duracio 2.0) (preu_atraccio 120))
+    (make-instance [a11] of ATRACCIO (nom "Universal Studios")  (ciutat [c4]) (duracio 1.0) (preu_atraccio 115))
     ;; Tenerife
-    (make-instance [a12] of ATRACCIO (nom "Teide")              (ciutat [c5]) (duracio 1.0))
-    (make-instance [a13] of ATRACCIO (nom "Loro Parque")        (ciutat [c5]) (duracio 1.0))
-    (make-instance [a14] of ATRACCIO (nom "Siam Park")          (ciutat [c5]) (duracio 1.0))
+    (make-instance [a12] of ATRACCIO (nom "Teide")              (ciutat [c5]) (duracio 1.0) (preu_atraccio 25))
+    (make-instance [a13] of ATRACCIO (nom "Loro Parque")        (ciutat [c5]) (duracio 1.0) (preu_atraccio 40))
+    (make-instance [a14] of ATRACCIO (nom "Siam Park")          (ciutat [c5]) (duracio 1.0) (preu_atraccio 40))
     ;; Maldives
-    (make-instance [a15] of ATRACCIO (nom "Atòl de Malé")       (ciutat [c6]) (duracio 0.5))
-    (make-instance [a16] of ATRACCIO (nom "Esculls de corall")  (ciutat [c6]) (duracio 0.5))
-    (make-instance [a17] of ATRACCIO (nom "Platges de sorra blanca") (ciutat [c6]) (duracio 1.0))
+    (make-instance [a15] of ATRACCIO (nom "Atòl de Malé")       (ciutat [c6]) (duracio 0.5) (preu_atraccio 0))
+    (make-instance [a16] of ATRACCIO (nom "Esculls de corall")  (ciutat [c6]) (duracio 0.5) (preu_atraccio 0))
+    (make-instance [a17] of ATRACCIO (nom "Platges de sorra blanca") (ciutat [c6]) (duracio 1.0) (preu_atraccio 0))
     ;; Londres
-    (make-instance [a18] of ATRACCIO (nom "Big Ben")            (ciutat [c7]) (duracio 0.5))
-    (make-instance [a19] of ATRACCIO (nom "London Eye")         (ciutat [c7]) (duracio 0.5))
-    (make-instance [a20] of ATRACCIO (nom "British Museum")     (ciutat [c7]) (duracio 2.0))
+    (make-instance [a18] of ATRACCIO (nom "Big Ben")            (ciutat [c7]) (duracio 0.5) (preu_atraccio 0))
+    (make-instance [a19] of ATRACCIO (nom "London Eye")         (ciutat [c7]) (duracio 0.5) (preu_atraccio 30))
+    (make-instance [a20] of ATRACCIO (nom "British Museum")     (ciutat [c7]) (duracio 2.0) (preu_atraccio 0))
     ;; Berlín
-    (make-instance [a21] of ATRACCIO (nom "Porta de Brandenburg") (ciutat [c8]) (duracio 0.5))
-    (make-instance [a22] of ATRACCIO (nom "Mur de Berlín")      (ciutat [c8]) (duracio 1.0))
-    (make-instance [a23] of ATRACCIO (nom "Illa dels Museus")   (ciutat [c8]) (duracio 2.0))
+    (make-instance [a21] of ATRACCIO (nom "Porta de Brandenburg") (ciutat [c8]) (duracio 0.5) (preu_atraccio 0))
+    (make-instance [a22] of ATRACCIO (nom "Mur de Berlín")      (ciutat [c8]) (duracio 1.0) (preu_atraccio 0))
+    (make-instance [a23] of ATRACCIO (nom "Illa dels Museus")   (ciutat [c8]) (duracio 2.0) (preu_atraccio 18))
     ;; Bali
-    (make-instance [a24] of ATRACCIO (nom "Temple d'Uluwatu")   (ciutat [c9]) (duracio 1.0))
-    (make-instance [a25] of ATRACCIO (nom "Camps d'arròs d'Ubud") (ciutat [c9]) (duracio 0.5))
-    (make-instance [a26] of ATRACCIO (nom "Tanah Lot")          (ciutat [c9]) (duracio 0.5))
-
+    (make-instance [a24] of ATRACCIO (nom "Temple d'Uluwatu")   (ciutat [c9]) (duracio 1.0) (preu_atraccio 3))
+    (make-instance [a25] of ATRACCIO (nom "Camps d'arròs d'Ubud") (ciutat [c9]) (duracio 0.5) (preu_atraccio 0))
+    (make-instance [a26] of ATRACCIO (nom "Tanah Lot")          (ciutat [c9]) (duracio 0.5) (preu_atraccio 3))
+    
     (make-instance [v1] of VIATGE (id_viatge "V1") (tipus_viatge ROMANTIC) (ciutat_desti [c1]) (preu_total 1200) (duracio_dies 7))
     (make-instance [v2] of VIATGE (id_viatge "V2") (tipus_viatge ROMANTIC) (ciutat_desti [c3]) (preu_total 1400) (duracio_dies 5))
     (make-instance [v3] of VIATGE (id_viatge "V3") (tipus_viatge ROMANTIC) (ciutat_desti [c6]) (preu_total 3500) (duracio_dies 10))
@@ -246,52 +268,54 @@
     (make-instance [v9] of VIATGE (id_viatge "V9") (tipus_viatge CULTURAL) (ciutat_desti [c8]) (preu_total 850)  (duracio_dies 5))
 
     ;; Rutes des de París
-    (make-instance [t1] of TRANSPORT (ciutat_origen "Paris") (ciutat_desti "Londres") (tipus_transport TREN))
-    (make-instance [t2] of TRANSPORT (ciutat_origen "Paris") (ciutat_desti "Berlin")  (tipus_transport TREN))
-    (make-instance [t3] of TRANSPORT (ciutat_origen "Paris") (ciutat_desti "Roma")    (tipus_transport AVIO))
-    (make-instance [t4] of TRANSPORT (ciutat_origen "Paris") (ciutat_desti "Orlando") (tipus_transport AVIO))
+    (make-instance [t1] of TRANSPORT (ciutat_origen "Paris") (ciutat_desti "Londres") (tipus_transport TREN) (preu_transport 50))
+    (make-instance [t2] of TRANSPORT (ciutat_origen "Paris") (ciutat_desti "Berlin")  (tipus_transport TREN) (preu_transport 50))
+    (make-instance [t3] of TRANSPORT (ciutat_origen "Paris") (ciutat_desti "Roma")    (tipus_transport AVIO) (preu_transport 150))
+    (make-instance [t4] of TRANSPORT (ciutat_origen "Paris") (ciutat_desti "Orlando") (tipus_transport AVIO) (preu_transport 150))
 
     ;; Rutes des de Roma
-    (make-instance [t5] of TRANSPORT (ciutat_origen "Roma") (ciutat_desti "Venecia") (tipus_transport TREN))
-    (make-instance [t6] of TRANSPORT (ciutat_origen "Roma") (ciutat_desti "Paris")   (tipus_transport TREN))
-    (make-instance [t7] of TRANSPORT (ciutat_origen "Roma") (ciutat_desti "Berlin")  (tipus_transport AVIO))
-    (make-instance [t8] of TRANSPORT (ciutat_origen "Roma") (ciutat_desti "Palma")   (tipus_transport VAIXELL))
+    (make-instance [t5] of TRANSPORT (ciutat_origen "Roma") (ciutat_desti "Venecia") (tipus_transport TREN) (preu_transport 50))
+    (make-instance [t6] of TRANSPORT (ciutat_origen "Roma") (ciutat_desti "Paris")   (tipus_transport TREN) (preu_transport 50))
+    (make-instance [t7] of TRANSPORT (ciutat_origen "Roma") (ciutat_desti "Berlin")  (tipus_transport AVIO) (preu_transport 150))
+    (make-instance [t8] of TRANSPORT (ciutat_origen "Roma") (ciutat_desti "Palma")   (tipus_transport VAIXELL) (preu_transport 80))
 
     ;; Rutes de connexió a Venècia
-    (make-instance [t9]  of TRANSPORT (ciutat_origen "Venecia") (ciutat_desti "Roma")    (tipus_transport TREN))
-    (make-instance [t10] of TRANSPORT (ciutat_origen "Venecia") (ciutat_desti "Londres")   (tipus_transport VAIXELL))
+    (make-instance [t9]  of TRANSPORT (ciutat_origen "Venecia") (ciutat_desti "Roma")    (tipus_transport TREN) (preu_transport 50))
+    (make-instance [t10] of TRANSPORT (ciutat_origen "Venecia") (ciutat_desti "Londres")   (tipus_transport VAIXELL) (preu_transport 80))
 
     ;; Rutes des de Londres
-    (make-instance [t11] of TRANSPORT (ciutat_origen "Londres") (ciutat_desti "Berlin")    (tipus_transport TREN))
-    (make-instance [t12] of TRANSPORT (ciutat_origen "Londres") (ciutat_desti "Tenerife") (tipus_transport AVIO))
-    (make-instance [t13] of TRANSPORT (ciutat_origen "Londres") (ciutat_desti "Maldives") (tipus_transport AVIO))
+    (make-instance [t11] of TRANSPORT (ciutat_origen "Londres") (ciutat_desti "Berlin")    (tipus_transport TREN) (preu_transport 50))
+    (make-instance [t12] of TRANSPORT (ciutat_origen "Londres") (ciutat_desti "Tenerife") (tipus_transport AVIO) (preu_transport 150))
+    (make-instance [t13] of TRANSPORT (ciutat_origen "Londres") (ciutat_desti "Maldives") (tipus_transport AVIO) (preu_transport 150))
 
     ;; Rutes des de Berlín
-    (make-instance [t14] of TRANSPORT (ciutat_origen "Berlin") (ciutat_desti "Paris")   (tipus_transport TREN))
-    (make-instance [t15] of TRANSPORT (ciutat_origen "Berlin") (ciutat_desti "Roma")    (tipus_transport AVIO))
-    (make-instance [t16] of TRANSPORT (ciutat_origen "Berlin") (ciutat_desti "Bali")    (tipus_transport AVIO))
+    (make-instance [t14] of TRANSPORT (ciutat_origen "Berlin") (ciutat_desti "Paris")   (tipus_transport TREN) (preu_transport 50))
+    (make-instance [t15] of TRANSPORT (ciutat_origen "Berlin") (ciutat_desti "Roma")    (tipus_transport AVIO) (preu_transport 150))
+    (make-instance [t16] of TRANSPORT (ciutat_origen "Berlin") (ciutat_desti "Bali")    (tipus_transport AVIO) (preu_transport 150))
 
     ;; Rutes de tornada o enllaç des d'illes o intercontinentals
-    (make-instance [t17] of TRANSPORT (ciutat_origen "Tenerife") (ciutat_desti "Madrid")  (tipus_transport AVIO))
-    (make-instance [t18] of TRANSPORT (ciutat_origen "Orlando")  (ciutat_desti "Londres") (tipus_transport AVIO))
-    (make-instance [t19] of TRANSPORT (ciutat_origen "Maldives") (ciutat_desti "Roma")    (tipus_transport AVIO))
-    (make-instance [t20] of TRANSPORT (ciutat_origen "Bali")     (ciutat_desti "Paris")   (tipus_transport AVIO))
+    (make-instance [t17] of TRANSPORT (ciutat_origen "Tenerife") (ciutat_desti "Madrid")  (tipus_transport AVIO) (preu_transport 150))
+    (make-instance [t18] of TRANSPORT (ciutat_origen "Orlando")  (ciutat_desti "Londres") (tipus_transport AVIO) (preu_transport 150))
+    (make-instance [t19] of TRANSPORT (ciutat_origen "Maldives") (ciutat_desti "Roma")    (tipus_transport AVIO) (preu_transport 150))
+    (make-instance [t20] of TRANSPORT (ciutat_origen "Bali")     (ciutat_desti "Paris")   (tipus_transport AVIO) (preu_transport 150))
 )
 
 ;; Selecciona totes les atraccions que capiguen en els dies disponibles
+;; Retorna atraccions i preu_atraccions
 (deffunction selecciona-atraccions-ciutat (?ciutat ?dies_disponibles)
-    (bind $?atraccions (send ?ciutat get-atraccions))
     (bind ?seleccionades (create$))
     (bind ?dies_usats 0)
+    (bind ?preu_atraccions 0)
     (do-for-all-instances ((?a ATRACCIO))
         (eq (send ?a get-ciutat) ?ciutat)
         (bind ?dur (send ?a get-duracio))
         (if (<= (+ ?dies_usats ?dur) ?dies_disponibles) then
             (bind ?seleccionades (create$ ?seleccionades (instance-name ?a)))
+            (bind ?preu_atraccions (+ ?preu_atraccions (send ?a get-preu_atraccio)))
             (bind ?dies_usats (+ ?dies_usats ?dur))
         )
     )
-    ?seleccionades
+    (create$ ?preu_atraccions ?seleccionades)
 )
 
 (defrule RECOMANACIO::crea-seq-un-element
@@ -308,18 +332,33 @@
             (duracio_dies  ?dur)
             (preu_total    ?preu)
             (ciutat_desti  ?ciutat_desti))
+    (object (is-a ALLOTJAMENT)
+        (name ?allotjament)
+        (ciutat ?ciutat_desti)
+        (estrelles ?estrelles)
+        (preu_nit ?preu_allotjament)
+    )
     (test (<= ?dur ?dies-max))
-    (test (or (<= ?preu ?pres)
-              (and (eq ?sacrifica TRUE) (<= ?preu (* ?pres 1.25)))))
     (test (<= ?dur ?dies_ciutats_max))
     (test (>= ?dur ?dies_ciutats_min))
-    =>
-    (bind ?atraccions (selecciona-atraccions-ciutat ?ciutat_desti ?dur))
-    (assert (SOLUCIO-PARCIAL (viatges ?v)
-                             (dies_total ?dur)
-                             (cost_total ?preu)
-                             (transports (create$))
-                             (atraccions ?atraccions)))
+    (test (or (eq ?sacrifica TRUE) (>= ?estrelles 3))) ;; aixo s'hauria d'abstraure
+    =>  
+    (bind $?atraccions-i-preu (selecciona-atraccions-ciutat ?ciutat_desti ?dur))
+    (bind ?preu_atraccions (nth$ 1 $?atraccions-i-preu))
+    (bind $?atraccions (rest$ $?atraccions-i-preu))
+    (bind ?preu_total (+ ?preu (* ?preu_allotjament ?dur) ?preu_atraccions))
+    
+    ;; Comprovem el preu aquí perquè necessitem preu_atraccions
+    (if (or (<= ?preu_total ?pres)
+            (and (eq ?sacrifica TRUE) (<= ?preu_total (* ?pres 1.25))))
+        then
+        (assert (SOLUCIO-PARCIAL (viatges ?v)
+                                 (dies_total ?dur)
+                                 (cost_total ?preu_total)
+                                 (transports (create$))
+                                 (atraccions $?atraccions)
+                                 (allotjaments ?allotjament)))
+    )
 )
 
 (defrule RECOMANACIO::exten-sequencia
@@ -335,11 +374,13 @@
             (transport_prohibit $?trans_prohibit))
 
     (SOLUCIO-PARCIAL (viatges $?vs)
-                     (dies_total ?dies-act)
-                     (cost_total ?cost-act)
+                     (dies_total ?dies_total)
+                     (cost_total ?cost_total)
                      (transports $?ts)
-                     (atraccions $?as))
+                     (atraccions $?as)
+                     (allotjaments $?allotjaments))
 
+    ;; necessitem l'ultim viatge per assegurar que el transport sigui possible
     (object (is-a VIATGE) (name ?ultim_viatge) (ciutat_desti ?ciutat_origen))
     (test (eq ?ultim_viatge (nth$ (length$ $?vs) $?vs)))
 
@@ -349,12 +390,20 @@
             (preu_total    ?preu)
             (ciutat_desti ?ciutat_desti))
 
+    (object (is-a ALLOTJAMENT)
+        (name ?allotjament)
+        (ciutat ?ciutat_desti)
+        (estrelles ?estrelles)
+        (preu_nit ?preu_allotjament)
+    )
     ;; assegurem que existeix transport que conecti ciutats
     (object (is-a TRANSPORT)
             (name ?id_transport)
             (ciutat_origen ?id_origen)
             (ciutat_desti ?id_desti)
-            (tipus_transport ?tipus_transport))
+            (tipus_transport ?tipus_transport)
+            (preu_transport ?preu_transport))
+    
     (test (eq (send ?ciutat_origen get-nom) ?id_origen))
     (test (eq (send ?ciutat_desti get-nom) ?id_desti))
 
@@ -364,27 +413,33 @@
     (test (not (member$ ?v ?vs)))
     
     ;; la suma de dies està per sota del màxim
-    (test (<= (+ ?dies-act ?dur) ?dies-max))
+    (test (<= (+ ?dies_total ?dur) ?dies-max))
 
-    ;; el cost combinat és assolible
-    (test (or (<= (+ ?cost-act ?preu) ?pres)
-              (and (eq ?sacrifica TRUE)
-                   (<= (+ ?cost-act ?preu) (* ?pres 1.25)))))
-    
     ;; la seq de viatges (ciutats visitades) esta per sota de max
     (test (<= (+ (length$ $?vs) 1) ?ciutats_max))
     
     ;; la parada a la ciutat es coherent amb el rang dels dies per ciutat
     (test (<= ?dur ?dies_ciutats_max))
     (test (>= ?dur ?dies_ciutats_min))
+
+    (test (or (eq ?sacrifica TRUE) (>= ?estrelles 3))) ;; aixo s'hauria d'abstraure
     =>
-    (bind ?atraccio (selecciona-atraccions-ciutat ?ciutat_desti ?dur))
-    (assert (SOLUCIO-PARCIAL
-        (viatges     $?vs ?v)
-        (dies_total  (+ ?dies-act ?dur))
-        (cost_total  (+ ?cost-act ?preu))
-        (transports  $?ts ?id_transport)
-        (atraccions $?as $?atraccio))
+    (bind $?atraccions-i-preu (selecciona-atraccions-ciutat ?ciutat_desti ?dur))
+    (bind ?preu_atraccions (nth$ 1 $?atraccions-i-preu))
+    (bind $?atraccions (rest$ $?atraccions-i-preu))
+    (bind ?preu_total (+ ?preu (* ?preu_allotjament ?dur) ?preu_atraccions ?preu_transport))
+    ;; Comprovem el preu aquí perquè necessitem preu_atraccions
+    (if (or (<= (+ ?cost_total ?preu_total) ?pres)
+            (and (eq ?sacrifica TRUE) (<= (+ ?cost_total ?preu_total) (* ?pres 1.25))))
+        then
+        (assert (SOLUCIO-PARCIAL
+            (viatges     $?vs ?v)
+            (dies_total  (+ ?dies_total ?dur))
+            (cost_total  (+ ?cost_total ?preu_total))
+            (transports  $?ts ?id_transport)
+            (atraccions $?as $?atraccions)
+            (allotjaments $?allotjaments ?allotjament))
+        )
     )
 )
 
@@ -430,6 +485,9 @@
         (if (< ?v-index (length$ ?vs)) then
             (printout t " → "))
     )
+    ;; Imprimir allotjaments
+    (printout t crlf "   Allotjaments: ")
+    
     ;; Imprimir atraccions 
     (printout t crlf "   Visites: ")
     (progn$ (?v ?vs)
@@ -470,7 +528,8 @@
         (progn$ (?transport ?ts)
             (printout t (send ?transport get-ciutat_origen) 
             "-" (send ?transport get-ciutat_desti) 
-            ": " (send ?transport get-tipus_transport))
+            ": " (send ?transport get-tipus_transport)
+            " (" (send ?transport get-preu_transport) " €)")
             (if (< ?idx (length$ ?ts)) then (printout t " → "))
             (bind ?idx (+ ?idx 1))
         )

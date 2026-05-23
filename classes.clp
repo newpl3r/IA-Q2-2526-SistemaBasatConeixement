@@ -19,7 +19,6 @@
 (defclass CIUTAT (is-a USER)
     (slot nom (type STRING))
     (slot tematica (type SYMBOL) (allowed-values MEDITERRANIA EUROPEA_GRAN NATURALESA))
-    (slot cost_diari_estimat (type INTEGER))
     (multislot atraccions (type INSTANCE) (allowed-classes ATRACCIO))
 )
 
@@ -35,6 +34,7 @@
     (slot ciutat_origen (type STRING))
     (slot ciutat_desti (type STRING))
     (slot tipus_transport (type SYMBOL) (allowed-values TREN AVIO VAIXELL CAP))
+    (slot preu_transport (type INTEGER))
 )
 
 (defclass ATRACCIO (is-a USER)
@@ -42,4 +42,13 @@
     (slot ciutat (type INSTANCE) (allowed-classes CIUTAT))
     (slot duracio (type FLOAT)) ;; en dies (0.5, 1, 2)
     (slot conegut (type SYMBOL) (allowed-values SI NO))
+    (slot preu_atraccio (type INTEGER))
+    ;; importancia
+)
+
+(defclass ALLOTJAMENT (is-a USER)
+    (slot nom) ;; LA (londres) o PA (parís)
+    (slot ciutat)
+    (slot estrelles (type INTEGER))
+    (slot preu_nit (type INTEGER))
 )
