@@ -19,15 +19,7 @@
 (defclass CIUTAT (is-a USER)
     (slot nom (type STRING))
     (slot tematica (type SYMBOL) (allowed-values MEDITERRANIA EUROPEA_GRAN NATURALESA))
-    (multislot atraccions (type INSTANCE) (allowed-classes ATRACCIO))
-)
-
-(defclass VIATGE (is-a USER)
-    (slot id_viatge (type STRING))
     (slot tipus_viatge (type SYMBOL) (allowed-values ROMANTIC CULTURAL DESCANS DIVERSIO))
-    (slot ciutat_desti (type INSTANCE))
-    (slot preu_total (type INTEGER))
-    (slot duracio_dies (type INTEGER))
 )
 
 (defclass TRANSPORT (is-a USER)
