@@ -29,16 +29,7 @@
     =>
     (printout t "Quants anys tens? ")
     (bind ?resp (read))
-    (if (< ?resp 18) then
-        (send [usuari_actual] put-rang_edat MENOR)
-        (send [usuari_actual] put-viatja_amb_nens TRUE)
-    else (if (and (>= ?resp 18) (< ?resp 45)) then
-        (send [usuari_actual] put-rang_edat JOVE)
-    else (if (and (>= ?resp 45) (< ?resp 65)) then
-        (send [usuari_actual] put-rang_edat MITJANA-EDAT)
-    else (if (> ?resp 65) then
-        (send [usuari_actual] put-rang_edat GRAN)
-    ))))
+    (send [usuari_actual] put-edat ?resp)
 )
 
 (defrule RECOLLIDA-DADES::pregunta-persones
@@ -47,8 +38,36 @@
     (bind ?resp (read))
     (if (eq ?resp 1) then
         (send [usuari_actual] put-perfil_deduit INDIVIDUAL)
+        (send [usuari_actual] put-viatja_amb_nens FALSE)
     )
     (send [usuari_actual] put-persones_viatjant ?resp)
+)
+
+(defrule RECOLLIDA-DADES::pregunta-grup
+    ;; Només s'executa si l'usuari ja ha dit quantes persones viatgen i el perfil encara és DESCONEGUT
+    (object (is-a USUARI) (name [usuari_actual]) (persones_viatjant ?n) (perfil_deduit DESCONEGUT))
+    =>
+    (if (eq ?n 2) then
+        (printout t "Viatges amb la teva parella (si/no): ")
+        (bind ?resp (read))
+        (if (eq ?resp si) then
+            (send [usuari_actual] put-perfil_deduit PARELLA)
+            (send [usuari_actual] put-viatja_amb_nens FALSE)
+        else
+            (send [usuari_actual] put-perfil_deduit GRUP)
+            (send [usuari_actual] put-viatja_amb_nens FALSE)
+        )
+    else (if (> ?n 2) then
+        (printout t "Viatges en familia o amb amics? (familia/amics): ")
+        (bind ?resp (read))
+        (if (eq ?resp familia) then
+            (send [usuari_actual] put-perfil_deduit FAMILIA)
+            (send [usuari_actual] put-viatja_amb_nens TRUE)
+        else (if (eq ?resp amics) then
+            (send [usuari_actual] put-perfil_deduit GRUP)
+            (send [usuari_actual] put-viatja_amb_nens FALSE)
+        ))
+    ))
 )
 
 (defrule RECOLLIDA-DADES::pregunta-pressupost
@@ -68,35 +87,6 @@
 
     (send [usuari_actual] put-dies_min ?dies-min)
     (send [usuari_actual] put-dies_max ?dies-max)
-)
-
-(defrule RECOLLIDA-DADES::pregunta-grup
-    =>
-    (bind ?n_persones (send [usuari_actual] get-persones_viatjant))
-    (if (eq ?n_persones 2) then
-        (printout t "Viatges amb la teva parella (si/no): ")
-        (bind ?resp (read))
-        (if (eq ?resp si) then
-            (send [usuari_actual] put-perfil_deduit PARELLA)
-        else
-            (send [usuari_actual] put-perfil_deduit GRUP)
-        )
-        
-    )
-    (if (> ?n_persones 2) then
-        (printout t "Viatges en familia o amb amics? (familia/amics): ")
-        (bind ?resp (read))
-        (if (eq ?resp familia) then
-            (send [usuari_actual] put-perfil_deduit FAMILIA)
-            (send [usuari_actual] put-viatja_amb_nens TRUE)
-        else (if (eq ?resp parella) then
-            (send [usuari_actual] put-perfil_deduit PARELLA)
-        else (if (eq ?resp individual) then
-            (send [usuari_actual] put-perfil_deduit INDIVIDUAL)
-        else (if (eq ?resp amics) then
-            (send [usuari_actual] put-perfil_deduit GRUP)
-        ))))
-    )
 )
 
 (defrule RECOLLIDA-DADES::pregunta-num-ciutats
@@ -125,7 +115,7 @@
 
 (defrule RECOLLIDA-DADES::pregunta-transport
     =>
-    (printout t "Hi ha algun tipus de transporte (avió, vaixell o tren) que no puguis agafar?" crlf)
+    (printout t "Hi ha algun tipus de transporte (avió, vaixell, tren, autobus o cotxe) que no puguis agafar?" crlf)
     (printout t "Introdueix-los un a un. Escriu 'fi' quan hagis acabat o si no en vols prohibir cap." crlf)
     
     (bind $?prohibits (create$))
@@ -137,6 +127,8 @@
         (if (or (eq ?resp avio) (eq ?resp avió)) then (bind ?simbol AVIO))
         (if (eq ?resp vaixell)                 then (bind ?simbol VAIXELL))
         (if (eq ?resp tren)                    then (bind ?simbol TREN))
+        (if (eq ?resp autobus)                  then (bind ?simbol AUTOBUS))
+        (if (eq ?resp cotxe)                   then (bind ?simbol COTXE))
         
         (if (and (neq ?simbol CAP) (not (member$ ?simbol $?prohibits)))
             then (bind $?prohibits (insert$ $?prohibits (+ (length$ $?prohibits) 1) ?simbol))
@@ -169,10 +161,31 @@
     (printout t "Tens preferència per visitar llocs menys coneguts? (si/no): ")
     (bind ?resp (read))
     (if (eq ?resp si) then
-        (send [usuari_actual] put-destins_desconeguts TRUE)
+        (send [usuari_actual] put-llocs_menys_coneguts TRUE)
     else
-        (send [usuari_actual] put-destins_desconeguts FALSE)
+        (send [usuari_actual] put-llocs_menys_coneguts FALSE)
     )
+)
+
+(defrule RECOLLIDA-DADES::pregunta-estrelles
+    =>
+    (printout t "Quina es la qualitat minima (en estrelles) que exigeixes per a l'allotjament? (1-5): ")
+    (bind ?resp (read))
+    (send [usuari_actual] put-qualitat_min_estrelles ?resp)
+)
+
+(defrule RECOLLIDA-DADES::pregunta-nivell-cultural
+    =>
+    (printout t "Quin es el teu nivell d'interes cultural? (baix/mitja/alt): ")
+    (bind ?resp (read))
+    (send [usuari_actual] put-nivell_cultural ?resp)
+)
+
+(defrule RECOLLIDA-DADES::pregunta-esdeveniment
+    =>
+    (printout t "Aquest viatge es per algun esdeveniment especial? (boda/fi_de_curs/aniversari/jubilacio/cap): ")
+    (bind ?resp (read))
+    (send [usuari_actual] put-esdev_especial ?resp)
 )
 
 ;;; ==============================================================
@@ -216,7 +229,7 @@
 )
 
 (defrule INFERENCIA::dedueix-destins-desconeguts
-    (object (is-a USUARI) (destins_desconeguts TRUE) (estil_economic FALSE))
+    (object (is-a USUARI) (llocs_menys_coneguts TRUE) (estil_economic FALSE))
     =>
     (printout t crlf " >> [INFERENCIA] Usuari prefereix visitar llocs desconeguts: prioritzem atraccions poc conegudes.")
     ;; la variable ja està prou abstreta
