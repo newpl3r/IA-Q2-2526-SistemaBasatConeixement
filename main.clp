@@ -224,7 +224,7 @@
     (object (is-a USUARI) (sacrifica_qualitat TRUE))
     =>
     (printout t crlf " >> [INFERENCIA] L'usuari diu que està disposat a sacrificar la qualitat de l'allotjament: assumim preferència per allotjaments econòmics i atraccions gratuïtes.")
-    (send [usuari_actual] put-estil_economic TRUE)
+    (send [usuari_actual] put-actitud_despesa ESTALVIADOR)
 )
 
 (defrule INFERENCIA::dedueix-jove-pressupost-ajustat
@@ -233,12 +233,12 @@
     (test (< (/ ?pres ?n_persones) 1000))
     =>
     (printout t crlf " >> [INFERENCIA] Jove amb pressupost ajustat: prioritzem allotjaments econòmics i atraccions gratuïtes.")
-    (send [usuari_actual] put-estil_economic TRUE)
+    (send [usuari_actual] put-actitud_despesa ESTALVIADOR)
 )
 
 (defrule INFERENCIA::dedueix-destins-desconeguts
     (declare (salience 5))
-    (object (is-a USUARI) (llocs_menys_coneguts TRUE) (estil_economic FALSE))
+    (object (is-a USUARI) (llocs_menys_coneguts TRUE) (actitud_despesa EXIGENT))
     =>
     (printout t crlf " >> [INFERENCIA] Usuari prefereix visitar llocs desconeguts: prioritzem atraccions poc conegudes.")
     ;; la variable ja està prou abstreta
@@ -417,11 +417,11 @@
         (bind ?llista-atraccions (create$ ?llista-atraccions (instance-name ?a)))
     )
     ;; 2. Mirem la preferència de l'usuari
-    (bind ?estil_economic (send [usuari_actual] get-estil_economic))
-    (bind ?destins_desconeguts (send [usuari_actual] get-destins_desconeguts))
+    (bind ?actitud_despesa (send [usuari_actual] get-actitud_despesa))
+    (bind ?llocs_menys_coneguts (send [usuari_actual] get-llocs_menys_coneguts))
 
     ;; Ordenar per preu (bubble sort)
-    (if (eq ?estil_economic TRUE) then
+    (if (eq ?actitud_despesa ESTALVIADOR) then
         (bind ?mida (length$ ?llista-atraccions))
         (loop-for-count (?i 1 ?mida) do
             (loop-for-count (?j (+ ?i 1) ?mida) do
@@ -438,7 +438,7 @@
             )
         )
     ;; Ordenar de desconegudes a conegudes
-    elseif (eq ?destins_desconeguts TRUE) then
+    elseif (eq ?llocs_menys_coneguts TRUE) then
         (bind ?mida (length$ ?llista-atraccions))
         (loop-for-count (?i 1 ?mida) do
             (loop-for-count (?j (+ ?i 1) ?mida) do
@@ -631,14 +631,14 @@
 (defrule RECOMANACIO::puntua-coherencia-objectiu
     (declare (salience 5))
     ?viatge <- (VIATGE (ciutats $?cs) (dies_ciutat $?dies_ciutat) (cost_total ?cost) (atraccions $?as) (allotjaments $?allotjaments) (transports $?ts) (puntuacio 0))
-    (object (is-a USUARI) (objectiu_deduit ?obj) (pressupost_max ?pres) (estil_economic ?estil_economic))
+    (object (is-a USUARI) (objectiu_deduit ?obj) (pressupost_max ?pres) (actitud_despesa ?actitud_despesa))
     =>
     (bind ?punts 0)
     (bind ?punts (+ ?punts (* 10 (compta-atraccions-tematica ?obj $?as))))
     (if (<= ?cost ?pres) then
         (bind ?punts (+ ?punts 20))
     )
-    (if (eq ?estil_economic TRUE) then
+    (if (eq ?actitud_despesa ESTALVIADOR) then
         (bind ?punts (- ?punts (* 0.02 ?cost))) ;; 500 eur resta 10
     else
         (bind ?punts (- ?punts (* 0.001 ?cost)))

@@ -11,15 +11,10 @@
     (slot pressupost_max (type INTEGER))
     (slot dies_min (type INTEGER))
     (slot dies_max (type INTEGER))
-    (slot viatja_amb_nens (type SYMBOL) (allowed-values TRUE FALSE))
-    (slot sacrifica_qualitat (type SYMBOL) (allowed-values TRUE FALSE))
-    (slot perfil_deduit (type SYMBOL) (allowed-values INDIVIDUAL PARELLA FAMILIA GRUP))
-    (slot objectiu_deduit (type SYMBOL) (allowed-values ROMANTIC CULTURAL DIVERSIO DESCONEGUT))
-    (slot rang_edat (type SYMBOL) (allowed-values MENOR JOVE MITJANA-EDAT GRAN))
     (slot ciutats_min (type INTEGER))
     (slot ciutats_max (type INTEGER))
     (slot dies_ciutats_min (type INTEGER))
-    (slot dies_ciutats_max (type INTEGER))
+    (slot dies_ciutats_max (type INTEGER)) 
     (multislot transport_prohibit (type SYMBOL) (allowed-values TREN AVIO VAIXELL AUTOBUS COTXE CAP))
     (slot qualitat_min_estrelles (type INTEGER) (default 1))
 
@@ -28,13 +23,15 @@
     (slot nivell_cultural (type SYMBOL) (allowed-values BAIX MITJA ALT) (default MITJA))
     (slot llocs_menys_coneguts (type SYMBOL) (allowed-values TRUE FALSE))
 
+    (slot objectiu_deduit (type SYMBOL) (allowed-values ROMANTIC CULTURAL DIVERSIO DESCONEGUT))
+
     ;; =============================
     ;; PROBLEMA ABSTRACTE (PA)
     ;; =============================
     (slot rang_edat (type SYMBOL) (allowed-values MENOR JOVE MITJANA-EDAT GRAN DESCONEGUT) (default DESCONEGUT))
     (slot perfil_deduit (type SYMBOL) (allowed-values INDIVIDUAL PARELLA FAMILIA GRUP DESCONEGUT) (default DESCONEGUT))
     (slot nivell_pressupost (type SYMBOL) (allowed-values BAIX NORMAL ALT DESCONEGUT) (default DESCONEGUT))
-    (slot actitud_despesa (type SYMBOL) (allowed-values ESTALVIADOR EXIGENT DESCONEGUT) (default DESCONEGUT))
+    (slot actitud_despesa (type SYMBOL) (allowed-values ESTALVIADOR EXIGENT) (default EXIGENT))
 )
 
 
