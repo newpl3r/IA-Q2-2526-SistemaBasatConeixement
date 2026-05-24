@@ -222,13 +222,6 @@
     ;; la variable ja està prou abstreta
 )
 
-(defrule INFERENCIA::edat-gran-mobilitat-reduida
-    (object (is-a USUARI) (rang_edat GRAN))
-    =>
-    (printout t ">> Persona gran: descartem atraccions amb molta cua o esforç físic." crlf)
-    (send [usuari_actual] put-mobilitat_reduida TRUE)
-)
-
 ;;; ==============================================================
 ;;; MÒDUL 3: RECOMANACIÓ I FILTRATGE
 ;;; ==============================================================
