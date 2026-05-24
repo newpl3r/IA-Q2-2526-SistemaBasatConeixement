@@ -334,11 +334,11 @@
     (make-instance [c2] of CIUTAT (nom "Roma")     (tematica HISTORICA MEDITERRANIA) (tipus_viatge CULTURAL ROMANTIC))
     (make-instance [c3] of CIUTAT (nom "Venecia")  (tematica MEDITERRANIA) (tipus_viatge ROMANTIC CULTURAL))
     (make-instance [c4] of CIUTAT (nom "Orlando")  (tematica METROPOLI)    (tipus_viatge DIVERSIO))
-    (make-instance [c5] of CIUTAT (nom "Tenerife") (tematica COSTA_PLATJA) (tipus_viatge DIVERSIO))
+    (make-instance [c5] of CIUTAT (nom "Tenerife") (tematica COSTA_PLATJA) (tipus_viatge DIVERSIO AVENTURA))
     (make-instance [c6] of CIUTAT (nom "Maldives") (tematica EXOTICA)      (tipus_viatge ROMANTIC))
     (make-instance [c7] of CIUTAT (nom "Londres")  (tematica METROPOLI)    (tipus_viatge CULTURAL))
     (make-instance [c8] of CIUTAT (nom "Berlin")   (tematica HISTORICA)    (tipus_viatge CULTURAL))
-    (make-instance [c9] of CIUTAT (nom "Bali")     (tematica EXOTICA)      (tipus_viatge DIVERSIO))
+    (make-instance [c9] of CIUTAT (nom "Bali")     (tematica EXOTICA)      (tipus_viatge DIVERSIO AVENTURA))
 
     (make-instance [h1] of ALLOTJAMENT (nom "Hotel Paris Luxe") (ciutat [c1]) (tipus HOTEL) (estrelles 4) (preu_nit 120))
     (make-instance [h2] of ALLOTJAMENT (nom "Alberg Montmartre") (ciutat [c1]) (tipus ALBERG) (estrelles 2) (preu_nit 65))
@@ -566,7 +566,7 @@
 
     (VIATGE (objectiu ?obj) (nivell_allotjament ?niv) (ciutats) (cost_total 0))
 
-    (object (is-a CIUTAT) (name ?ciutat_desti) (tipus_viatge ?obj))
+    (object (is-a CIUTAT) (name ?ciutat_desti) (tipus_viatge $? ?obj $?))
 
     (object (is-a ALLOTJAMENT)
         (name ?allotjament)
@@ -627,7 +627,7 @@
     (object (is-a CIUTAT) (name ?ciutat_origen))
     (test (eq ?ciutat_origen (nth$ (length$ $?cs) $?cs)))
 
-    (object (is-a CIUTAT) (name ?ciutat_desti) (tipus_viatge ?obj))
+    (object (is-a CIUTAT) (name ?ciutat_desti) (tipus_viatge $? ?obj $?))
 
     ;; assegurem que existeix transport que conecti ciutats
     (object (is-a TRANSPORT)
@@ -848,9 +848,11 @@
             (sacrifica_qualitat ?sacrifica))
     =>
     (bind $?viatges_ordenats_per_puntuacio (ordena_viatges ?dies_min ?ciutats_min))
-    (imprimir_n_millors 2 ?viatges_ordenats_per_puntuacio ?pres ?sacrifica)
-
-    (assert (solucio-trobada))
+    
+    (if (> (length$ $?viatges_ordenats_per_puntuacio) 0) then
+        (imprimir_n_millors 2 ?viatges_ordenats_per_puntuacio ?pres ?sacrifica)
+        (assert (solucio-trobada))
+    )
 )
 
 (defrule RECOMANACIO::sense-propostes
