@@ -23,15 +23,13 @@
     (slot nivell_cultural (type SYMBOL) (allowed-values BAIX MITJA ALT) (default MITJA))
     (slot llocs_menys_coneguts (type SYMBOL) (allowed-values TRUE FALSE))
 
-    (slot objectiu_deduit (type SYMBOL) (allowed-values ROMANTIC CULTURAL DIVERSIO DESCONEGUT))
-
     ;; =============================
     ;; PROBLEMA ABSTRACTE (PA)
     ;; =============================
     (slot rang_edat (type SYMBOL) (allowed-values MENOR JOVE MITJANA-EDAT GRAN DESCONEGUT) (default DESCONEGUT))
     (slot perfil_deduit (type SYMBOL) (allowed-values INDIVIDUAL PARELLA FAMILIA GRUP DESCONEGUT) (default DESCONEGUT))
     (slot nivell_pressupost (type SYMBOL) (allowed-values BAIX NORMAL ALT DESCONEGUT) (default DESCONEGUT))
-    (slot actitud_despesa (type SYMBOL) (allowed-values ESTALVIADOR EXIGENT) (default EXIGENT))
+    (slot actitud_despesa (type SYMBOL) (allowed-values ESTALVIADOR EXIGENT DESCONEGUT) (default DESCONEGUT))
 )
 
 

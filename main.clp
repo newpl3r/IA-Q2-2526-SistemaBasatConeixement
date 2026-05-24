@@ -183,7 +183,7 @@
 
 (defrule RECOLLIDA-DADES::pregunta-esdeveniment
     =>
-    (printout t "Aquest viatge es per algun esdeveniment especial? (boda/fi_de_curs/aniversari/jubilacio/cap): ")
+    (printout t "Aquest viatge es per algun esdeveniment especial? (aniversari és de parella) (boda/fi_de_curs/aniversari/jubilacio/cap): ")
     (bind ?resp (read))
     (send [usuari_actual] put-esdev_especial ?resp)
 )
@@ -192,56 +192,103 @@
 ;;; MÒDUL 2: INFERÈNCIA DEL PERFIL (Coneixement Expert)
 ;;; ==============================================================
 
-(defrule INFERENCIA::dedueix-objectiu-familia
-    (object (is-a USUARI) (name [usuari_actual]) (viatja_amb_nens TRUE) (objectiu_deduit DESCONEGUT))
+(defrule INFERENCIA::abstraccio-edat
+    (object (is-a USUARI) (name [usuari_actual]) (edat ?e) (rang_edat DESCONEGUT))
     =>
-    (printout t crlf ">> [INFERENCIA] Viatja amb nens. Descartem descans pur. Objectiu: DIVERSIO.")
-    (send [usuari_actual] put-objectiu_deduit DIVERSIO)
+    (if (< ?e 18) then (send [usuari_actual] put-rang_edat MENOR)
+    else (if (<= ?e 30) then (send [usuari_actual] put-rang_edat JOVE)
+    else (if (<= ?e 55) then (send [usuari_actual] put-rang_edat MITJANA-EDAT)
+    else (send [usuari_actual] put-rang_edat GRAN))))
 )
 
-(defrule INFERENCIA::dedueix-objectiu-parella
-    (object (is-a USUARI) (name [usuari_actual]) (perfil_deduit PARELLA) (objectiu_deduit DESCONEGUT))
+(defrule INFERENCIA::abstraccio-actitud
+    (object (is-a USUARI) (name [usuari_actual]) (sacrifica_qualitat ?sac) (actitud_despesa DESCONEGUT))
     =>
-    (printout t crlf ">> [INFERENCIA] Viatja en parella. Suggerim un viatge ROMANTIC.")
-    (send [usuari_actual] put-objectiu_deduit ROMANTIC)
+    (if (eq ?sac TRUE) then (send [usuari_actual] put-actitud_despesa ESTALVIADOR)
+    else (send [usuari_actual] put-actitud_despesa EXIGENT))
 )
 
-(defrule INFERENCIA::dedueix-objectiu-individual
-    (object (is-a USUARI) (name [usuari_actual]) (perfil_deduit INDIVIDUAL) (objectiu_deduit DESCONEGUT))
+(defrule INFERENCIA::abstraccio-pressupost
+    (object (is-a USUARI) (name [usuari_actual]) 
+            (pressupost_max ?pres) (dies_max ?dies) (persones_viatjant ?pers)
+            (nivell_pressupost DESCONEGUT))
+    (test (> ?dies 0))
     =>
-    (printout t crlf ">> [INFERENCIA] Viatja en solitari. Suggerim un viatge CULTURAL per enriquir-se.")
-    (send [usuari_actual] put-objectiu_deduit CULTURAL)
+    ;; Calculem la despesa màxima per persona i dia per saber el nivell econòmic real
+    (bind ?pres_diari (/ ?pres (* ?dies ?pers)))
+    (if (< ?pres_diari 60) then (send [usuari_actual] put-nivell_pressupost BAIX)
+    else (if (<= ?pres_diari 150) then (send [usuari_actual] put-nivell_pressupost NORMAL)
+    else (send [usuari_actual] put-nivell_pressupost ALT)))
 )
 
-(defrule INFERENCIA::dedueix-objectiu-amics
-    (object (is-a USUARI) (name [usuari_actual]) (perfil_deduit GRUP) (objectiu_deduit DESCONEGUT))
+;; Regla 1: Esdeveniments especials tenen prioritat absoluta
+(defrule INFERENCIA::heuristica-esdeveniment-romantic
+    (object (is-a USUARI) (esdev_especial BODA | ANIVERSARI))
     =>
-    (printout t crlf ">> [INFERENCIA] Viatge amb amics. Suggerim un viatge orientat a la DIVERSIO.")
-    (send [usuari_actual] put-objectiu_deduit DIVERSIO)
+    (assert (diagnostic-objectiu ROMANTIC))
+    (assert (diagnostic-allotjament LUXE))
 )
 
-(defrule INFERENCIA::dedueix-pressupost
-    (object (is-a USUARI) (sacrifica_qualitat TRUE))
+(defrule INFERENCIA::heuristica-esdeveniment-fidecurs
+    (object (is-a USUARI) (esdev_especial FI_DE_CURS))
     =>
-    (printout t crlf " >> [INFERENCIA] L'usuari diu que està disposat a sacrificar la qualitat de l'allotjament: assumim preferència per allotjaments econòmics i atraccions gratuïtes.")
-    (send [usuari_actual] put-actitud_despesa ESTALVIADOR)
+    (assert (diagnostic-objectiu DIVERSIO))
+    (assert (diagnostic-allotjament ECONOMIC))
+)
+(defrule INFERENCIA::heuristica-esdeveniment-jubilacio
+    (object (is-a USUARI) (esdev_especial JUBILACIO))
+    =>
+    (assert (diagnostic-objectiu CULTURAL))
+    (assert (diagnostic-allotjament ESTANDARD)) ;; Basat en la recomanació de l'expert: Cultural i Confort
 )
 
-(defrule INFERENCIA::dedueix-jove-pressupost-ajustat
-    (declare (salience 10))
-    (object (is-a USUARI) (rang_edat JOVE) (persones_viatjant ?n_persones) (pressupost_max ?pres))
-    (test (< (/ ?pres ?n_persones) 1000))
+;; Regla 2: Famílies
+(defrule INFERENCIA::heuristica-familia
+    (object (is-a USUARI) (esdev_especial CAP) (perfil_deduit FAMILIA))
     =>
-    (printout t crlf " >> [INFERENCIA] Jove amb pressupost ajustat: prioritzem allotjaments econòmics i atraccions gratuïtes.")
-    (send [usuari_actual] put-actitud_despesa ESTALVIADOR)
+    (assert (diagnostic-objectiu DIVERSIO))
+    (assert (diagnostic-allotjament APARTAMENT_FAMILIAR))
 )
 
-(defrule INFERENCIA::dedueix-destins-desconeguts
-    (declare (salience 5))
-    (object (is-a USUARI) (llocs_menys_coneguts TRUE) (actitud_despesa EXIGENT))
+;; Regla 3: Joves i aventurers
+(defrule INFERENCIA::heuristica-joves-aventura
+    (object (is-a USUARI) (esdev_especial CAP) (perfil_deduit GRUP | INDIVIDUAL) 
+            (rang_edat JOVE) (actitud_despesa ESTALVIADOR))
     =>
-    (printout t crlf " >> [INFERENCIA] Usuari prefereix visitar llocs desconeguts: prioritzem atraccions poc conegudes.")
-    ;; la variable ja està prou abstreta
+    (assert (diagnostic-objectiu AVENTURA))
+    (assert (diagnostic-allotjament ECONOMIC))
+)
+
+;; Regla 4: Perfil Cultural i Exigent
+(defrule INFERENCIA::heuristica-cultural-exigent
+    (object (is-a USUARI) (esdev_especial CAP) (nivell_cultural ALT) 
+            (actitud_despesa EXIGENT) (perfil_deduit PARELLA | INDIVIDUAL))
+    =>
+    (assert (diagnostic-objectiu CULTURAL))
+    (assert (diagnostic-allotjament ESTANDARD))
+)
+
+;; Regla 5: Fallback (Si no encaixa en cap perfil anterior, receptem descans estàndard)
+(defrule INFERENCIA::heuristica-per-defecte
+    (declare (salience -5)) ;; Salience negatiu assegura que es dispara només si les altres no ho han fet
+    (not (diagnostic-objectiu ?))
+    =>
+    (assert (diagnostic-objectiu DESCANS))
+    (assert (diagnostic-allotjament ESTANDARD))
+)
+
+(defrule INFERENCIA::crea-solucio-abstracta
+    (declare (salience -10)) ;; S'executa al final de tota la inferència
+    ?obj <- (diagnostic-objectiu ?o)
+    ?allotj <- (diagnostic-allotjament ?a)
+    =>
+    (printout t crlf ">> [DIAGNOSTIC EXPERT] Objectiu viatge: " ?o " | Allotjament ideal: " ?a crlf)
+    
+    ;; Creem el motlle buit de la ruta amb el diagnòstic incrustat
+    (assert (RECOMANACIO::VIATGE (objectiu ?o) (nivell_allotjament ?a)))
+    
+    ;; Netegem els fets temporals de la memòria
+    (retract ?obj ?allotj)
 )
 
 ;;; ==============================================================
@@ -500,12 +547,13 @@
     (declare (salience 20))
     (object (is-a USUARI) (name [usuari_actual])
             (persones_viatjant  ?n_persones)
-            (objectiu_deduit    ?obj)
             (dies_max           ?dies-max)
             (pressupost_max     ?pres)
             (sacrifica_qualitat ?sacrifica)
             (dies_ciutats_min   ?dies_ciutats_min)
             (dies_ciutats_max   ?dies_ciutats_max))
+
+    (VIATGE (objectiu ?obj) (ciutats) (cost_total 0))
 
     (object (is-a CIUTAT) (name ?ciutat_desti) (tipus_viatge ?obj))
 
@@ -544,7 +592,6 @@
     ;; Mirem si podem afegir element a seq
     (object (is-a USUARI) (name [usuari_actual])
             (persones_viatjant  ?n_persones)
-            (objectiu_deduit    ?obj)
             (dies_max           ?dies-max)
             (ciutats_max        ?ciutats_max)
             (dies_ciutats_min   ?dies_ciutats_min)
@@ -553,7 +600,8 @@
             (sacrifica_qualitat ?sacrifica)
             (transport_prohibit $?trans_prohibit))
 
-    (VIATGE (ciutats $?cs)
+    (VIATGE (objectiu ?obj)
+            (ciutats $?cs)
             (dies_ciutat $?ds)
             (dies_total ?dies_total)
             (cost_total ?cost_total)
@@ -630,7 +678,7 @@
 
 (defrule RECOMANACIO::puntua-coherencia-objectiu
     (declare (salience 5))
-    ?viatge <- (VIATGE (ciutats $?cs) (dies_ciutat $?dies_ciutat) (cost_total ?cost) (atraccions $?as) (allotjaments $?allotjaments) (transports $?ts) (puntuacio 0))
+    ?viatge <- (VIATGE (objectiu ?obj) (ciutats $?cs) (dies_ciutat $?dies_ciutat) (cost_total ?cost) (atraccions $?as) (allotjaments $?allotjaments) (transports $?ts) (puntuacio 0))
     (object (is-a USUARI) (objectiu_deduit ?obj) (pressupost_max ?pres) (actitud_despesa ?actitud_despesa))
     =>
     (bind ?punts 0)
@@ -652,10 +700,10 @@
     (not (text-impres))
     (object (is-a USUARI) (name [usuari_actual])
             (dies_min        ?dies-min)
-            (dies_max        ?dies-max)
-            (objectiu_deduit ?obj))
+            (dies_max        ?dies-max))
+
     ;; no imprimeix si no hi ha sol vàlida
-    (VIATGE (dies_total ?dies))
+    (VIATGE (objectiu ?obj) (dies_total ?dies))
     (test (>= ?dies ?dies-min))
     =>
     (printout t crlf "==========================================" crlf)
