@@ -202,14 +202,20 @@
     =>
     (printout t "Quin es el teu nivell d'interes cultural? (baix/mitja/alt): ")
     (bind ?resp (read))
-    (send [usuari_actual] put-nivell_cultural ?resp)
+    (if (eq ?resp baix) then (send [usuari_actual] put-nivell_cultural BAIX)
+    else (if (eq ?resp mitja) then (send [usuari_actual] put-nivell_cultural MITJA)
+    else (send [usuari_actual] put-nivell_cultural ALT)))
 )
 
 (defrule RECOLLIDA-DADES::pregunta-esdeveniment
     =>
     (printout t "Aquest viatge es per algun esdeveniment especial? (aniversari és de parella) (boda/fi_de_curs/aniversari/jubilacio/cap): ")
     (bind ?resp (read))
-    (send [usuari_actual] put-esdev_especial ?resp)
+    (if (eq ?resp boda) then (send [usuari_actual] put-esdev_especial BODA)
+    else (if (eq ?resp fi_de_curs) then (send [usuari_actual] put-esdev_especial FI_DE_CURS)
+    else (if (eq ?resp aniversari) then (send [usuari_actual] put-esdev_especial ANIVERSARI)
+    else (if (eq ?resp jubilacio) then (send [usuari_actual] put-esdev_especial JUBILACIO)
+    else (send [usuari_actual] put-esdev_especial CAP)))))
 )
 
 ;;; ==============================================================
@@ -296,6 +302,7 @@
 (defrule INFERENCIA::heuristica-per-defecte
     (declare (salience -5)) ;; Salience negatiu assegura que es dispara només si les altres no ho han fet
     (not (diagnostic-objectiu ?))
+    (not (VIATGE))
     =>
     (assert (diagnostic-objectiu DESCANS))
     (assert (diagnostic-allotjament ESTANDARD))
