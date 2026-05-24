@@ -1,0 +1,364 @@
+@prefix : <http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3/> .
+
+<http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3> rdf:type owl:Ontology .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#arriba_de
+:arriba_de rdf:type owl:ObjectProperty ;
+           rdfs:subPropertyOf owl:topObjectProperty ;
+           rdfs:domain :TRANSPORT ;
+           rdfs:range :CIUTAT .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#ciutat
+:ciutat rdf:type owl:ObjectProperty ;
+        rdfs:subPropertyOf owl:topObjectProperty ;
+        rdfs:domain :ATRACCIO ;
+        rdfs:range :CIUTAT .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#ciutat_allotjament
+:ciutat_allotjament rdf:type owl:ObjectProperty ;
+                    rdfs:subPropertyOf owl:topObjectProperty ;
+                    rdfs:domain :ALLOTJAMENT ;
+                    rdfs:range :CIUTAT .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#conte
+:conte rdf:type owl:ObjectProperty ;
+       rdfs:subPropertyOf owl:topObjectProperty ;
+       rdfs:domain :CIUTAT ;
+       rdfs:range :ATRACCIO .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#ofereix
+:ofereix rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf owl:topObjectProperty ;
+         rdfs:domain :CIUTAT ;
+         rdfs:range :ALLOTJAMENT .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#surt_de
+:surt_de rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf owl:topObjectProperty ;
+         rdfs:domain :TRANSPORT ;
+         rdfs:range :CIUTAT .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#actitud_despesa
+:actitud_despesa rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdfs:domain :USUARI ;
+                 rdfs:range xsd:string ;
+                 rdfs:comment "(ESTALVIADOR EXIGENT DESCONEGUT)" .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#ciutat_desti
+:ciutat_desti rdf:type owl:DatatypeProperty ;
+              rdfs:subPropertyOf owl:topDataProperty ;
+              rdfs:domain :TRANSPORT ;
+              rdfs:range xsd:string ;
+              rdfs:comment "ID de ciutat" .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#ciutat_origen
+:ciutat_origen rdf:type owl:DatatypeProperty ;
+               rdfs:subPropertyOf owl:topDataProperty ;
+               rdfs:domain :TRANSPORT ;
+               rdfs:range xsd:string ;
+               rdfs:comment "ID de ciutat" .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#ciutats_max
+:ciutats_max rdf:type owl:DatatypeProperty ;
+             rdfs:subPropertyOf owl:topDataProperty ;
+             rdfs:domain :USUARI ;
+             rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#ciutats_min
+:ciutats_min rdf:type owl:DatatypeProperty ;
+             rdfs:subPropertyOf owl:topDataProperty ;
+             rdfs:domain :USUARI ;
+             rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#coneguda
+:coneguda rdf:type owl:DatatypeProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :ATRACCIO ;
+          rdfs:range xsd:boolean .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#dies_ciutats_max
+:dies_ciutats_max rdf:type owl:DatatypeProperty ;
+                  rdfs:subPropertyOf owl:topDataProperty ;
+                  rdfs:domain :USUARI ;
+                  rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#dies_ciutats_min
+:dies_ciutats_min rdf:type owl:DatatypeProperty ;
+                  rdfs:subPropertyOf owl:topDataProperty ;
+                  rdfs:domain :USUARI ;
+                  rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#dies_max
+:dies_max rdf:type owl:DatatypeProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :USUARI ;
+          rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#dies_min
+:dies_min rdf:type owl:DatatypeProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :USUARI ;
+          rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#duracio
+:duracio rdf:type owl:DatatypeProperty ;
+         rdfs:subPropertyOf owl:topDataProperty ;
+         rdfs:domain :ATRACCIO ;
+         rdfs:range xsd:float .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#edat
+:edat rdf:type owl:DatatypeProperty ;
+      rdfs:subPropertyOf owl:topDataProperty ;
+      rdfs:domain :USUARI ;
+      rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#esdev_especial
+:esdev_especial rdf:type owl:DatatypeProperty ;
+                rdfs:subPropertyOf owl:topDataProperty ;
+                rdfs:domain :USUARI ;
+                rdfs:range xsd:string ;
+                rdfs:comment "(CAP BODA FI_DE_CURS ANIVERSARI JUBILACIO)" .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#estrelles
+:estrelles rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdfs:domain :ALLOTJAMENT ;
+           rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#llocs_menys_coneguts
+:llocs_menys_coneguts rdf:type owl:DatatypeProperty ;
+                      rdfs:subPropertyOf owl:topDataProperty ;
+                      rdfs:domain :USUARI ;
+                      rdfs:range xsd:boolean .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#nivell_cultural
+:nivell_cultural rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdfs:domain :USUARI ;
+                 rdfs:range xsd:string ;
+                 rdfs:comment "(BAIX MITJA ALT)" .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#nivell_pressupost
+:nivell_pressupost rdf:type owl:DatatypeProperty ;
+                   rdfs:subPropertyOf owl:topDataProperty ;
+                   rdfs:domain :USUARI ;
+                   rdfs:range xsd:string ;
+                   rdfs:comment "(BAIX NORMAL ALT DESCONEGUT)" .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#nom
+:nom rdf:type owl:DatatypeProperty ;
+     rdfs:subPropertyOf owl:topDataProperty ;
+     rdfs:domain :ATRACCIO ;
+     rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#nom_allotjament
+:nom_allotjament rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdfs:domain :ALLOTJAMENT ;
+                 rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#perfil_deduit
+:perfil_deduit rdf:type owl:DatatypeProperty ;
+               rdfs:subPropertyOf owl:topDataProperty ;
+               rdfs:domain :USUARI ;
+               rdfs:range xsd:string ;
+               rdfs:comment "(INDIVIDUAL PARELLA FAMILIA GRUP DESCONEGUT)" .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#persones_viatjant
+:persones_viatjant rdf:type owl:DatatypeProperty ;
+                   rdfs:subPropertyOf owl:topDataProperty ;
+                   rdfs:domain :USUARI ;
+                   rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#pressupost_max
+:pressupost_max rdf:type owl:DatatypeProperty ;
+                rdfs:subPropertyOf owl:topDataProperty ;
+                rdfs:domain :USUARI ;
+                rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#preu_atraccio
+:preu_atraccio rdf:type owl:DatatypeProperty ;
+               rdfs:subPropertyOf owl:topDataProperty ;
+               rdfs:domain :ATRACCIO ;
+               rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#preu_nit
+:preu_nit rdf:type owl:DatatypeProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :ALLOTJAMENT ;
+          rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#preu_transport
+:preu_transport rdf:type owl:DatatypeProperty ;
+                rdfs:subPropertyOf owl:topDataProperty ;
+                rdfs:domain :TRANSPORT ;
+                rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#qualitat_min_estrelles
+:qualitat_min_estrelles rdf:type owl:DatatypeProperty ;
+                        rdfs:subPropertyOf owl:topDataProperty ;
+                        rdfs:domain :USUARI ;
+                        rdfs:range xsd:integer .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#rang_edat
+:rang_edat rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdfs:domain :USUARI ;
+           rdfs:range xsd:string ;
+           rdfs:comment "(MENOR JOVE MITJANA-EDAT GRAN DESCONEGUT)" .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#sacrifica_qualitat
+:sacrifica_qualitat rdf:type owl:DatatypeProperty ;
+                    rdfs:subPropertyOf owl:topDataProperty ;
+                    rdfs:domain :USUARI ;
+                    rdfs:range xsd:boolean .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#tematica
+:tematica rdf:type owl:DatatypeProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :ATRACCIO ;
+          rdfs:range xsd:string ;
+          rdfs:comment "(ROMANTIC CULTURAL DIVERSIO)" .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#tipus
+:tipus rdf:type owl:DatatypeProperty ;
+       rdfs:subPropertyOf owl:topDataProperty ;
+       rdfs:domain :ALLOTJAMENT ;
+       rdfs:range xsd:string ;
+       rdfs:comment "(HOTEL APARTAMENT ALBERG RESORT CAMPING)" .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#tipus_transport
+:tipus_transport rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdfs:domain :TRANSPORT ;
+                 rdfs:range xsd:string ;
+                 rdfs:comment "(TREN AVIO VAIXELL AUTOBUS COTXE CAP)" .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#tipus_viatge
+:tipus_viatge rdf:type owl:DatatypeProperty ;
+              rdfs:subPropertyOf owl:topDataProperty ;
+              rdfs:domain :CIUTAT ;
+              rdfs:range xsd:string ;
+              rdfs:comment "(MEDITERRANIA METROPOLI EXOTICA MUNTANYA COSTA_PLATJA HISTORICA)" .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#transport_prohibit
+:transport_prohibit rdf:type owl:DatatypeProperty ;
+                    rdfs:subPropertyOf owl:topDataProperty ;
+                    rdfs:domain :USUARI ;
+                    rdfs:range xsd:string ;
+                    rdfs:comment "(TREN AVIO VAIXELL AUTOBUS COTXE CAP)" .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#viatja_amb_nens
+:viatja_amb_nens rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdfs:domain :USUARI ;
+                 rdfs:range xsd:boolean .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#ALLOTJAMENT
+:ALLOTJAMENT rdf:type owl:Class ;
+             rdfs:subClassOf [ rdf:type owl:Restriction ;
+                               owl:onProperty :ciutat_allotjament ;
+                               owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                               owl:onClass :CIUTAT
+                             ] .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#ATRACCIO
+:ATRACCIO rdf:type owl:Class ;
+          rdfs:subClassOf [ rdf:type owl:Restriction ;
+                            owl:onProperty :ciutat ;
+                            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                            owl:onClass :CIUTAT
+                          ] .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#CIUTAT
+:CIUTAT rdf:type owl:Class ;
+        rdfs:subClassOf [ rdf:type owl:Restriction ;
+                          owl:onProperty :conte ;
+                          owl:someValuesFrom :ATRACCIO
+                        ] ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :ofereix ;
+                          owl:someValuesFrom :ALLOTJAMENT
+                        ] .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#TRANSPORT
+:TRANSPORT rdf:type owl:Class ;
+           rdfs:subClassOf [ rdf:type owl:Restriction ;
+                             owl:onProperty :arriba_de ;
+                             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :CIUTAT
+                           ] ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :surt_de ;
+                             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :CIUTAT
+                           ] .
+
+
+###  http://www.semanticweb.org/maria/ontologies/2026/4/untitled-ontology-3#USUARI
+:USUARI rdf:type owl:Class .
+
+
+###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi
