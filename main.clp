@@ -246,11 +246,6 @@
     (slot puntuacio (default 0))
 )
 
-(deftemplate RECOMANACIO::puntuacio-viatge
-    (slot ciutat (default none))
-    (slot punts (default 0))
-)
-
 ;;; --- Càrrega de dades ---
 (defrule RECOMANACIO::carrega-dades
     (declare (salience 50))
