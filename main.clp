@@ -849,9 +849,9 @@
 
 (defrule RECOMANACIO::filtra-allotjaments-valids
     (declare (salience 30))
-    (object (is-a USUARI) (sacrifica_qualitat ?sacrifica))
+    (object (is-a USUARI) (sacrifica_qualitat ?sacrifica) (qualitat_min_estrelles ?qualitat_min_estrelles))
     (object (is-a ALLOTJAMENT) (name ?allotjament) (estrelles ?estrelles))
-    (test (or (eq ?sacrifica TRUE) (>= ?estrelles 3)))
+    (test (or (eq ?sacrifica TRUE) (>= ?estrelles ?qualitat_min_estrelles)))
     =>
     (assert (allotjament-valid ?allotjament))
 )
@@ -1057,87 +1057,95 @@
 
 (deffunction imprimir_n_millors (?n ?viatges ?pres ?sacrifica) 
     (bind ?mida (length$ ?viatges))
-    (bind ?m (min ?n ?mida))
-    (loop-for-count (?i 1 ?m) do
+    (bind ?ciutats-usades (create$))
+    (bind ?impresos 0)
+    (bind ?i 1)
+
+    (while (and (<= ?i ?mida) (< ?impresos ?n)) do
         (bind ?v (nth$ ?i ?viatges))
-        
         (bind ?cs (fact-slot-value ?v ciutats))
-        (bind ?ds (fact-slot-value ?v dies_ciutat))
-        (bind ?dies (fact-slot-value ?v dies_total))
-        (bind ?cost (fact-slot-value ?v cost_total))
-        (bind ?ts (fact-slot-value ?v transports))
-        (bind ?as (fact-slot-value ?v atraccions))
-        (bind ?allotjaments (fact-slot-value ?v allotjaments))
-        (bind ?puntuacio (fact-slot-value ?v puntuacio))
 
-        (printout t crlf "Ruta (" (length$ ?cs) " destins): ")
-        ;; Imprimir ciutats
-        ;; progn -> es repeteixen les inst del bloc 1 cop per element llista
+        ;; Comprova si alguna ciutat d'aquest viatge ja ha estat usada
+        (bind ?solapament FALSE)
         (progn$ (?ciutat ?cs)
-            (bind ?dur (nth$ ?ciutat-index $?ds))
-            (printout t (send ?ciutat get-nom) " ["?dur "d]")
-            (if (< ?ciutat-index (length$ ?cs)) then
-                (printout t " → "))
-        )
-        ;; Imprimir allotjaments
-        (printout t crlf "   Allotjaments: ")
-        (progn$ (?allotjament ?allotjaments)
-            (bind ?ciutat (send ?allotjament get-ciutat))
-            (printout t (send ?ciutat get-nom) ": " (send ?allotjament get-nom) 
-                        " " (send ?allotjament get-estrelles) "* ("
-                        (send ?allotjament get-preu_nit) "€)")
-            (if (< ?allotjament-index (length$ ?allotjaments)) then 
-                (printout t ", "))
-        )
-        
-        ;; Imprimir atraccions 
-        (printout t crlf "   Visites: ")
-        (progn$ (?ciutat ?cs)
-            ;; Subcadena de atraccions (de la ciutat)
-            (bind ?as_ciutat (create$))
-            (progn$ (?a ?as)
-                (if (eq (send ?a get-ciutat) ?ciutat) then
-                    (bind ?as_ciutat (create$ ?as_ciutat ?a)))
+            (if (member$ ?ciutat ?ciutats-usades) then
+                (bind ?solapament TRUE)
             )
+        )
 
-            (printout t crlf "     · " (send ?ciutat get-nom) ": ")
-            (if (> (length$ ?as_ciutat) 0) then        
-                (progn$ (?a $?as_ciutat)
-                    (printout t (send ?a get-nom) " (" (send ?a get-preu_atraccio) "€)")
-                    (if (< ?a-index (length$ $?as_ciutat)) then
-                        (printout t ", "))
+        (if (eq ?solapament FALSE) then
+            ;; Afegim les ciutats d'aquest viatge a les usades
+            (progn$ (?ciutat ?cs)
+                (bind ?ciutats-usades (create$ ?ciutats-usades ?ciutat))
+            )
+            (bind ?impresos (+ ?impresos 1))
+
+            (bind ?ds (fact-slot-value ?v dies_ciutat))
+            (bind ?dies (fact-slot-value ?v dies_total))
+            (bind ?cost (fact-slot-value ?v cost_total))
+            (bind ?ts (fact-slot-value ?v transports))
+            (bind ?as (fact-slot-value ?v atraccions))
+            (bind ?allotjaments (fact-slot-value ?v allotjaments))
+            (bind ?puntuacio (fact-slot-value ?v puntuacio))
+
+            (printout t crlf "Ruta (" (length$ ?cs) " destins): ")
+            (progn$ (?ciutat ?cs)
+                (bind ?dur (nth$ ?ciutat-index $?ds))
+                (printout t (send ?ciutat get-nom) " [" ?dur "d]")
+                (if (< ?ciutat-index (length$ ?cs)) then
+                    (printout t " → "))
+            )
+            (printout t crlf "   Allotjaments: ")
+            (progn$ (?allotjament ?allotjaments)
+                (bind ?ciutat (send ?allotjament get-ciutat))
+                (printout t (send ?ciutat get-nom) ": " (send ?allotjament get-nom) 
+                            " " (send ?allotjament get-estrelles) "* ("
+                            (send ?allotjament get-preu_nit) "€)")
+                (if (< ?allotjament-index (length$ ?allotjaments)) then 
+                    (printout t ", "))
+            )
+            (printout t crlf "   Visites: ")
+            (progn$ (?ciutat ?cs)
+                (bind ?as_ciutat (create$))
+                (progn$ (?a ?as)
+                    (if (eq (send ?a get-ciutat) ?ciutat) then
+                        (bind ?as_ciutat (create$ ?as_ciutat ?a)))
                 )
-            else
-                (printout t "(sense visites)")
+                (printout t crlf "     · " (send ?ciutat get-nom) ": ")
+                (if (> (length$ ?as_ciutat) 0) then        
+                    (progn$ (?a $?as_ciutat)
+                        (printout t (send ?a get-nom) " (" (send ?a get-preu_atraccio) "€)")
+                        (if (< ?a-index (length$ $?as_ciutat)) then
+                            (printout t ", "))
+                    )
+                else
+                    (printout t "(sense visites)")
+                )
             )
-        )
-        ;; Imprimir cost i dies
-        (if (<= ?cost ?pres)then
-            (printout t crlf "   Dies total: " ?dies
-                            " | Preu total: " ?cost " €" crlf)
-        else (if (and (eq ?sacrifica TRUE)
-                    (<= ?cost (* ?pres 1.25))) then
-            (printout t crlf "   Dies total: " ?dies
-                            " | PREU AJUSTAT: " ?cost " €" crlf)
-        )
-        )
-        ;; Imprimir transport
-        (if (> (length$ ?ts) 0) then
-            (printout t "   Transports: ")
-            (bind ?idx 1)
-            (progn$ (?transport ?ts)
-                (printout t (send ?transport get-ciutat_origen) 
-                "-" (send ?transport get-ciutat_desti) 
-                ": " (send ?transport get-tipus_transport)
-                " (" (send ?transport get-preu_transport) " €)")
-                (if (< ?idx (length$ ?ts)) then (printout t " → "))
-                (bind ?idx (+ ?idx 1))
+            (if (<= ?cost ?pres) then
+                (printout t crlf "   Dies total: " ?dies
+                                " | Preu total: " ?cost " €" crlf)
+            else (if (and (eq ?sacrifica TRUE)
+                        (<= ?cost (* ?pres 1.25))) then
+                (printout t crlf "   Dies total: " ?dies
+                                " | PREU AJUSTAT: " ?cost " €" crlf)
+            ))
+            (if (> (length$ ?ts) 0) then
+                (printout t "   Transports: ")
+                (bind ?idx 1)
+                (progn$ (?transport ?ts)
+                    (printout t (send ?transport get-ciutat_origen) 
+                    "-" (send ?transport get-ciutat_desti) 
+                    ": " (send ?transport get-tipus_transport)
+                    " (" (send ?transport get-preu_transport) " €)")
+                    (if (< ?idx (length$ ?ts)) then (printout t " → "))
+                    (bind ?idx (+ ?idx 1))
+                )
+                (printout t crlf)
             )
-            (printout t crlf)
+            (printout t "   Puntuació: " ?puntuacio crlf)
         )
-
-        ;; Imprimir puntuacio
-        (printout t "   Puntuació: " ?puntuacio crlf)
+        (bind ?i (+ ?i 1))
     )
 )
 
