@@ -553,7 +553,7 @@
             (dies_ciutats_min   ?dies_ciutats_min)
             (dies_ciutats_max   ?dies_ciutats_max))
 
-    (VIATGE (objectiu ?obj) (ciutats) (cost_total 0))
+    (VIATGE (objectiu ?obj) (nivell_allotjament ?niv) (ciutats) (cost_total 0))
 
     (object (is-a CIUTAT) (name ?ciutat_desti) (tipus_viatge ?obj))
 
@@ -575,13 +575,15 @@
             (if (or (<= ?preu_total ?pres)
                     (and (eq ?sacrifica TRUE) (<= ?preu_total (* ?pres 1.25))))
                 then
-                (assert (VIATGE (ciutats ?ciutat_desti)
-                                        (dies_ciutat ?dur)
-                                        (dies_total ?dur)
-                                        (cost_total ?preu_total)
-                                        (transports (create$))
-                                        (atraccions $?atraccions)
-                                        (allotjaments ?allotjament)))
+                (assert (VIATGE (objectiu ?obj)
+                                (nivell_allotjament ?niv)
+                                (ciutats ?ciutat_desti)
+                                (dies_ciutat ?dur)
+                                (dies_total ?dur)
+                                (cost_total ?preu_total)
+                                (transports (create$))
+                                (atraccions $?atraccions)
+                                (allotjaments ?allotjament)))
             )
         )
     )
@@ -601,6 +603,7 @@
             (transport_prohibit $?trans_prohibit))
 
     (VIATGE (objectiu ?obj)
+            (nivell_allotjament ?niv)
             (ciutats $?cs)
             (dies_ciutat $?ds)
             (dies_total ?dies_total)
@@ -653,6 +656,8 @@
                     (and (eq ?sacrifica TRUE) (<= (+ ?cost_total ?preu_total) (* ?pres 1.25))))
                 then
                 (assert (VIATGE
+                    (objectiu ?obj)
+                    (nivell_allotjament ?niv)
                     (ciutats     $?cs ?ciutat_desti)
                     (dies_ciutat $?ds ?dur)
                     (dies_total  (+ ?dies_total ?dur))
@@ -679,7 +684,7 @@
 (defrule RECOMANACIO::puntua-coherencia-objectiu
     (declare (salience 5))
     ?viatge <- (VIATGE (objectiu ?obj) (ciutats $?cs) (dies_ciutat $?dies_ciutat) (cost_total ?cost) (atraccions $?as) (allotjaments $?allotjaments) (transports $?ts) (puntuacio 0))
-    (object (is-a USUARI) (objectiu_deduit ?obj) (pressupost_max ?pres) (actitud_despesa ?actitud_despesa))
+    (object (is-a USUARI) (pressupost_max ?pres) (actitud_despesa ?actitud_despesa))
     =>
     (bind ?punts 0)
     (bind ?punts (+ ?punts (* 10 (compta-atraccions-tematica ?obj $?as))))
