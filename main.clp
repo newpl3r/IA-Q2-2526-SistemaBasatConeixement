@@ -8,6 +8,30 @@
 (defmodule RECOMANACIO (import MAIN ?ALL))
 
 ;;; ==============================================================
+;;; EL MOTLLE PRINCIPAL (L'hem de definir abans d'usar-lo)
+;;; ==============================================================
+
+(deftemplate MAIN::VIATGE
+    ;; =============================
+    ;; SOLUCIÓ ABSTRACTA (SA)
+    ;; =============================
+    (slot objectiu)          
+    (slot nivell_allotjament)
+
+    ;; =============================
+    ;; SOLUCIÓ CONCRETA (SC)
+    ;; =============================
+    (multislot ciutats)
+    (multislot dies_ciutat)
+    (slot dies_total (default 0))
+    (slot cost_total (default 0))
+    (multislot transports)
+    (multislot atraccions)
+    (multislot allotjaments)
+    (slot puntuacio (default 0))
+)
+
+;;; ==============================================================
 ;;; CONTROL DE FLUX (MAIN)
 ;;; ==============================================================
 
@@ -285,7 +309,7 @@
     (printout t crlf ">> [DIAGNOSTIC EXPERT] Objectiu viatge: " ?o " | Allotjament ideal: " ?a crlf)
     
     ;; Creem el motlle buit de la ruta amb el diagnòstic incrustat
-    (assert (RECOMANACIO::VIATGE (objectiu ?o) (nivell_allotjament ?a)))
+    (assert (VIATGE (objectiu ?o) (nivell_allotjament ?a)))
     
     ;; Netegem els fets temporals de la memòria
     (retract ?obj ?allotj)
@@ -295,60 +319,40 @@
 ;;; MÒDUL 3: RECOMANACIÓ I FILTRATGE
 ;;; ==============================================================
 
-(deftemplate RECOMANACIO::VIATGE
-    ;; =============================
-    ;; SOLUCIÓ ABSTRACTA (SA)
-    ;; =============================
-    (slot objectiu)          
-    (slot nivell_allotjament)
-
-    ;; =============================
-    ;; SOLUCIÓ CONCRETA (SC)
-    ;; =============================
-    (multislot ciutats)
-    (multislot dies_ciutat)
-    (slot dies_total (default 0))
-    (slot cost_total (default 0))
-    (multislot transports)
-    (multislot atraccions)
-    (multislot allotjaments)
-    (slot puntuacio (default 0))
-)
-
 ;;; --- Càrrega de dades ---
 (defrule RECOMANACIO::carrega-dades
     (declare (salience 50))
     =>    
-    (make-instance [c1] of CIUTAT (nom "Paris")    (tematica EUROPEA_GRAN) (tipus_viatge ROMANTIC))
-    (make-instance [c2] of CIUTAT (nom "Roma")     (tematica MEDITERRANIA) (tipus_viatge CULTURAL))
-    (make-instance [c3] of CIUTAT (nom "Venecia")  (tematica MEDITERRANIA) (tipus_viatge ROMANTIC))
-    (make-instance [c4] of CIUTAT (nom "Orlando")  (tematica DIVERSIO)     (tipus_viatge DIVERSIO))
-    (make-instance [c5] of CIUTAT (nom "Tenerife") (tematica DIVERSIO)     (tipus_viatge DIVERSIO))
-    (make-instance [c6] of CIUTAT (nom "Maldives") (tematica NATURALESA)    (tipus_viatge ROMANTIC))
-    (make-instance [c7] of CIUTAT (nom "Londres")  (tematica EUROPEA_GRAN) (tipus_viatge CULTURAL))
-    (make-instance [c8] of CIUTAT (nom "Berlin")   (tematica EUROPEA_GRAN) (tipus_viatge CULTURAL))
-    (make-instance [c9] of CIUTAT (nom "Bali")     (tematica NATURALESA)    (tipus_viatge DIVERSIO))
+    (make-instance [c1] of CIUTAT (nom "Paris")    (tematica METROPOLI HISTORICA)    (tipus_viatge ROMANTIC CULTURAL))
+    (make-instance [c2] of CIUTAT (nom "Roma")     (tematica HISTORICA MEDITERRANIA) (tipus_viatge CULTURAL ROMANTIC))
+    (make-instance [c3] of CIUTAT (nom "Venecia")  (tematica MEDITERRANIA) (tipus_viatge ROMANTIC CULTURAL))
+    (make-instance [c4] of CIUTAT (nom "Orlando")  (tematica METROPOLI)    (tipus_viatge DIVERSIO))
+    (make-instance [c5] of CIUTAT (nom "Tenerife") (tematica COSTA_PLATJA) (tipus_viatge DIVERSIO))
+    (make-instance [c6] of CIUTAT (nom "Maldives") (tematica EXOTICA)      (tipus_viatge ROMANTIC))
+    (make-instance [c7] of CIUTAT (nom "Londres")  (tematica METROPOLI)    (tipus_viatge CULTURAL))
+    (make-instance [c8] of CIUTAT (nom "Berlin")   (tematica HISTORICA)    (tipus_viatge CULTURAL))
+    (make-instance [c9] of CIUTAT (nom "Bali")     (tematica EXOTICA)      (tipus_viatge DIVERSIO))
 
-    (make-instance [h1] of ALLOTJAMENT (nom "PA") (ciutat [c1]) (estrelles 4) (preu_nit 120))
-    (make-instance [h2] of ALLOTJAMENT (nom "PA") (ciutat [c1]) (estrelles 2) (preu_nit 65))
-    (make-instance [h3] of ALLOTJAMENT (nom "PA") (ciutat [c1]) (estrelles 5) (preu_nit 200))
-    (make-instance [h4] of ALLOTJAMENT (nom "RA") (ciutat [c2]) (estrelles 3) (preu_nit 80))
-    (make-instance [h5] of ALLOTJAMENT (nom "RA") (ciutat [c2]) (estrelles 4) (preu_nit 110))
-    (make-instance [h6] of ALLOTJAMENT (nom "VA") (ciutat [c3]) (estrelles 3) (preu_nit 95))
-    (make-instance [h7] of ALLOTJAMENT (nom "VA") (ciutat [c3]) (estrelles 5) (preu_nit 210))
-    (make-instance [h8] of ALLOTJAMENT (nom "OA") (ciutat [c4]) (estrelles 3) (preu_nit 100))
-    (make-instance [h9] of ALLOTJAMENT (nom "OA") (ciutat [c4]) (estrelles 4) (preu_nit 140))
-    (make-instance [h10] of ALLOTJAMENT (nom "TA") (ciutat [c5]) (estrelles 2) (preu_nit 45))
-    (make-instance [h11] of ALLOTJAMENT (nom "TA") (ciutat [c5]) (estrelles 4) (preu_nit 85))
-    (make-instance [h12] of ALLOTJAMENT (nom "MA") (ciutat [c6]) (estrelles 5) (preu_nit 250))
-    (make-instance [h13] of ALLOTJAMENT (nom "MA") (ciutat [c6]) (estrelles 3) (preu_nit 130))
-    (make-instance [h14] of ALLOTJAMENT (nom "LA") (ciutat [c7]) (estrelles 3) (preu_nit 105))
-    (make-instance [h15] of ALLOTJAMENT (nom "LA") (ciutat [c7]) (estrelles 4) (preu_nit 150))
-    (make-instance [h16] of ALLOTJAMENT (nom "LA") (ciutat [c7]) (estrelles 2) (preu_nit 70))
-    (make-instance [h17] of ALLOTJAMENT (nom "BA") (ciutat [c8]) (estrelles 3) (preu_nit 70))
-    (make-instance [h18] of ALLOTJAMENT (nom "BA") (ciutat [c8]) (estrelles 1) (preu_nit 35))
-    (make-instance [h19] of ALLOTJAMENT (nom "BA") (ciutat [c9]) (estrelles 4) (preu_nit 65))
-    (make-instance [h20] of ALLOTJAMENT (nom "BA") (ciutat [c9]) (estrelles 2) (preu_nit 30))
+    (make-instance [h1] of ALLOTJAMENT (nom "Hotel Paris Luxe") (ciutat [c1]) (tipus HOTEL) (estrelles 4) (preu_nit 120))
+    (make-instance [h2] of ALLOTJAMENT (nom "Alberg Montmartre") (ciutat [c1]) (tipus ALBERG) (estrelles 2) (preu_nit 65))
+    (make-instance [h3] of ALLOTJAMENT (nom "Resort Champs-Élysées") (ciutat [c1]) (tipus RESORT) (estrelles 5) (preu_nit 200))
+    (make-instance [h4] of ALLOTJAMENT (nom "Hotel Roma Antic") (ciutat [c2]) (tipus HOTEL) (estrelles 3) (preu_nit 80))
+    (make-instance [h5] of ALLOTJAMENT (nom "Apartament Colosseu") (ciutat [c2]) (tipus APARTAMENT) (estrelles 4) (preu_nit 110))
+    (make-instance [h6] of ALLOTJAMENT (nom "Hotel Venecia") (ciutat [c3]) (tipus HOTEL) (estrelles 3) (preu_nit 95))
+    (make-instance [h7] of ALLOTJAMENT (nom "Resort Gran Canal") (ciutat [c3]) (tipus RESORT) (estrelles 5) (preu_nit 210))
+    (make-instance [h8] of ALLOTJAMENT (nom "Hotel Orlando") (ciutat [c4]) (tipus HOTEL) (estrelles 3) (preu_nit 100))
+    (make-instance [h9] of ALLOTJAMENT (nom "Resort Disney") (ciutat [c4]) (tipus RESORT) (estrelles 4) (preu_nit 140))
+    (make-instance [h10] of ALLOTJAMENT (nom "Apartament Teide") (ciutat [c5]) (tipus APARTAMENT) (estrelles 2) (preu_nit 45))
+    (make-instance [h11] of ALLOTJAMENT (nom "Hotel Tenerife") (ciutat [c5]) (tipus HOTEL) (estrelles 4) (preu_nit 85))
+    (make-instance [h12] of ALLOTJAMENT (nom "Resort Maldives Luxe") (ciutat [c6]) (tipus RESORT) (estrelles 5) (preu_nit 250))
+    (make-instance [h13] of ALLOTJAMENT (nom "Hotel Maldives") (ciutat [c6]) (tipus HOTEL) (estrelles 3) (preu_nit 130))
+    (make-instance [h14] of ALLOTJAMENT (nom "Hotel Londres") (ciutat [c7]) (tipus HOTEL) (estrelles 3) (preu_nit 105))
+    (make-instance [h15] of ALLOTJAMENT (nom "Apartament Soho") (ciutat [c7]) (tipus APARTAMENT) (estrelles 4) (preu_nit 150))
+    (make-instance [h16] of ALLOTJAMENT (nom "Alberg Camden") (ciutat [c7]) (tipus ALBERG) (estrelles 2) (preu_nit 70))
+    (make-instance [h17] of ALLOTJAMENT (nom "Hotel Berlin") (ciutat [c8]) (tipus HOTEL) (estrelles 3) (preu_nit 70))
+    (make-instance [h18] of ALLOTJAMENT (nom "Alberg Kreuzberg") (ciutat [c8]) (tipus ALBERG) (estrelles 1) (preu_nit 35))
+    (make-instance [h19] of ALLOTJAMENT (nom "Resort Bali") (ciutat [c9]) (tipus RESORT) (estrelles 4) (preu_nit 65))
+    (make-instance [h20] of ALLOTJAMENT (nom "Alberg Ubud") (ciutat [c9]) (tipus ALBERG) (estrelles 2) (preu_nit 30))
 
     ;; París (c1)
     (make-instance [a1]  of ATRACCIO (nom "Torre Eiffel")       (ciutat [c1]) (duracio 1.0) (preu_atraccio 25) (coneguda TRUE)  (tematica ROMANTIC))
@@ -761,7 +765,7 @@
         ;; Imprimir ciutats
         ;; progn -> es repeteixen les inst del bloc 1 cop per element llista
         (progn$ (?ciutat ?cs)
-            (bind ?dur (nth ?ciutat-index $?ds))
+            (bind ?dur (nth$ ?ciutat-index $?ds))
             (printout t (send ?ciutat get-nom) " ["?dur "d]")
             (if (< ?ciutat-index (length$ ?cs)) then
                 (printout t " → "))
