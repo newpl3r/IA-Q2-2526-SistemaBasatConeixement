@@ -853,11 +853,7 @@
     (object (is-a ALLOTJAMENT) (name ?allotjament) (estrelles ?estrelles))
     (test (or (eq ?sacrifica TRUE) (>= ?estrelles ?qualitat_min_estrelles)))
     =>
-    ;; Si sacrifica qualitat, permetem baixar fins a 1 estrella (o la que tingui), 
-    ;; si NO sacrifica, obliguem a complir la qualitat mínima demanada per l'usuari.
-    (if (or (eq ?sacrifica TRUE) (>= ?estrelles ?min_est)) then
-        (assert (allotjament-valid ?allotjament))
-    )
+    (assert (allotjament-valid ?allotjament))
 )
 
 (defrule RECOMANACIO::crea-seq-un-element
