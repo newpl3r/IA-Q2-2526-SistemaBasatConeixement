@@ -227,6 +227,15 @@
 ;;; ==============================================================
 
 (deftemplate RECOMANACIO::VIATGE
+    ;; =============================
+    ;; SOLUCIÓ ABSTRACTA (SA)
+    ;; =============================
+    (slot objectiu)          
+    (slot nivell_allotjament)
+
+    ;; =============================
+    ;; SOLUCIÓ CONCRETA (SC)
+    ;; =============================
     (multislot ciutats)
     (multislot dies_ciutat)
     (slot dies_total (default 0))
