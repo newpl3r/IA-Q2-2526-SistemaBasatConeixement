@@ -207,8 +207,16 @@
     (send [usuari_actual] put-objectiu_deduit DIVERSIO)
 )
 
+(defrule INFERENCIA::dedueix-pressupost
+    (object (is-a USUARI) (sacrifica_qualitat TRUE))
+    =>
+    (printout t crlf " >> [INFERENCIA] L'usuari diu que està disposat a sacrificar la qualitat de l'allotjament: assumim preferència per allotjaments econòmics i atraccions gratuïtes.")
+    (send [usuari_actual] put-estil_economic TRUE)
+)
+
 (defrule INFERENCIA::dedueix-jove-pressupost-ajustat
-    (object (is-a USUARI) (rang_edat JOVE) (persones_viatjant ?n_persones) (pressupost_max ?pres) (sacrifica_qualitat TRUE))
+    (declare (salience 10))
+    (object (is-a USUARI) (rang_edat JOVE) (persones_viatjant ?n_persones) (pressupost_max ?pres))
     (test (< (/ ?pres ?n_persones) 1000))
     =>
     (printout t crlf " >> [INFERENCIA] Jove amb pressupost ajustat: prioritzem allotjaments econòmics i atraccions gratuïtes.")
@@ -216,6 +224,7 @@
 )
 
 (defrule INFERENCIA::dedueix-destins-desconeguts
+    (declare (salience 5))
     (object (is-a USUARI) (destins_desconeguts TRUE) (estil_economic FALSE))
     =>
     (printout t crlf " >> [INFERENCIA] Usuari prefereix visitar llocs desconeguts: prioritzem atraccions poc conegudes.")
@@ -234,9 +243,15 @@
     (multislot transports)
     (multislot atraccions)
     (multislot allotjaments)
+    (slot puntuacio (default 0))
 )
 
-;;; --- Càrrega de dades (sense canvis) ---
+(deftemplate RECOMANACIO::puntuacio-viatge
+    (slot ciutat (default none))
+    (slot punts (default 0))
+)
+
+;;; --- Càrrega de dades ---
 (defrule RECOMANACIO::carrega-dades
     (declare (salience 50))
     =>    
@@ -272,76 +287,76 @@
     (make-instance [h20] of ALLOTJAMENT (nom "BA") (ciutat [c9]) (estrelles 2) (preu_nit 30))
 
     ;; París (c1)
-    (make-instance [a1]  of ATRACCIO (nom "Torre Eiffel")       (ciutat [c1]) (duracio 1.0) (preu_atraccio 25) (coneguda TRUE))
-    (make-instance [a2]  of ATRACCIO (nom "Museu del Louvre")   (ciutat [c1]) (duracio 1.0) (preu_atraccio 17) (coneguda TRUE))
-    (make-instance [a3]  of ATRACCIO (nom "Notre-Dame")         (ciutat [c1]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE))
-    (make-instance [a27] of ATRACCIO (nom "Les Catacumbes")     (ciutat [c1]) (duracio 0.5) (preu_atraccio 29) (coneguda FALSE))
-    (make-instance [a28] of ATRACCIO (nom "Sainte-Chapelle")    (ciutat [c1]) (duracio 0.5) (preu_atraccio 15) (coneguda FALSE))
-    (make-instance [a29] of ATRACCIO (nom "Canal Saint-Martin") (ciutat [c1]) (duracio 0.5) (preu_atraccio 0)  (coneguda FALSE))
+    (make-instance [a1]  of ATRACCIO (nom "Torre Eiffel")       (ciutat [c1]) (duracio 1.0) (preu_atraccio 25) (coneguda TRUE)  (tematica ROMANTIC))
+    (make-instance [a2]  of ATRACCIO (nom "Museu del Louvre")   (ciutat [c1]) (duracio 1.0) (preu_atraccio 17) (coneguda TRUE)  (tematica CULTURAL))
+    (make-instance [a3]  of ATRACCIO (nom "Notre-Dame")         (ciutat [c1]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE)  (tematica CULTURAL))
+    (make-instance [a27] of ATRACCIO (nom "Les Catacumbes")     (ciutat [c1]) (duracio 0.5) (preu_atraccio 29) (coneguda FALSE) (tematica CULTURAL))
+    (make-instance [a28] of ATRACCIO (nom "Sainte-Chapelle")    (ciutat [c1]) (duracio 0.5) (preu_atraccio 15) (coneguda FALSE) (tematica CULTURAL))
+    (make-instance [a29] of ATRACCIO (nom "Canal Saint-Martin") (ciutat [c1]) (duracio 0.5) (preu_atraccio 0)  (coneguda FALSE) (tematica ROMANTIC))
 
     ;; Roma (c2)
-    (make-instance [a4]  of ATRACCIO (nom "Coliseu")            (ciutat [c2]) (duracio 1.0) (preu_atraccio 16) (coneguda TRUE))
-    (make-instance [a5]  of ATRACCIO (nom "Fontana di Trevi")   (ciutat [c2]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE))
-    (make-instance [a6]  of ATRACCIO (nom "Vaticà")             (ciutat [c2]) (duracio 2.0) (preu_atraccio 17) (coneguda TRUE))
-    (make-instance [a30] of ATRACCIO (nom "Termes de Caracal·la")(ciutat [c2]) (duracio 0.5) (preu_atraccio 10) (coneguda FALSE))
-    (make-instance [a31] of ATRACCIO (nom "Via Appia Antica")   (ciutat [c2]) (duracio 1.0) (preu_atraccio 0)  (coneguda FALSE))
-    (make-instance [a32] of ATRACCIO (nom "Barri de Trastevere")(ciutat [c2]) (duracio 0.5) (preu_atraccio 0)  (coneguda FALSE))
+    (make-instance [a4]  of ATRACCIO (nom "Coliseu")            (ciutat [c2]) (duracio 1.0) (preu_atraccio 16) (coneguda TRUE)  (tematica CULTURAL))
+    (make-instance [a5]  of ATRACCIO (nom "Fontana di Trevi")   (ciutat [c2]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE)  (tematica ROMANTIC))
+    (make-instance [a6]  of ATRACCIO (nom "Vaticà")             (ciutat [c2]) (duracio 2.0) (preu_atraccio 17) (coneguda TRUE)  (tematica CULTURAL))
+    (make-instance [a30] of ATRACCIO (nom "Termes de Caracal·la")(ciutat [c2]) (duracio 0.5) (preu_atraccio 10) (coneguda FALSE) (tematica CULTURAL))
+    (make-instance [a31] of ATRACCIO (nom "Via Appia Antica")   (ciutat [c2]) (duracio 1.0) (preu_atraccio 0)  (coneguda FALSE) (tematica CULTURAL))
+    (make-instance [a32] of ATRACCIO (nom "Barri de Trastevere")(ciutat [c2]) (duracio 0.5) (preu_atraccio 0)  (coneguda FALSE) (tematica ROMANTIC))
 
     ;; Venècia (c3)
-    (make-instance [a7]  of ATRACCIO (nom "Canal Gran")         (ciutat [c3]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE))
-    (make-instance [a8]  of ATRACCIO (nom "Plaça de Sant Marc") (ciutat [c3]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE))
-    (make-instance [a9]  of ATRACCIO (nom "Pont de Rialto")     (ciutat [c3]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE))
-    (make-instance [a33] of ATRACCIO (nom "Illa de Burano")     (ciutat [c3]) (duracio 1.0) (preu_atraccio 10) (coneguda FALSE))
-    (make-instance [a34] of ATRACCIO (nom "Llibreria Acqua Alta")(ciutat [c3]) (duracio 0.5) (preu_atraccio 0)  (coneguda FALSE))
-    (make-instance [a35] of ATRACCIO (nom "Ghetto Jueu")        (ciutat [c3]) (duracio 0.5) (preu_atraccio 0)  (coneguda FALSE))
+    (make-instance [a7]  of ATRACCIO (nom "Canal Gran")         (ciutat [c3]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE)  (tematica ROMANTIC))
+    (make-instance [a8]  of ATRACCIO (nom "Plaça de Sant Marc") (ciutat [c3]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE)  (tematica CULTURAL))
+    (make-instance [a9]  of ATRACCIO (nom "Pont de Rialto")     (ciutat [c3]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE)  (tematica ROMANTIC))
+    (make-instance [a33] of ATRACCIO (nom "Illa de Burano")     (ciutat [c3]) (duracio 1.0) (preu_atraccio 10) (coneguda FALSE) (tematica ROMANTIC))
+    (make-instance [a34] of ATRACCIO (nom "Llibreria Acqua Alta")(ciutat [c3]) (duracio 0.5) (preu_atraccio 0)  (coneguda FALSE) (tematica CULTURAL))
+    (make-instance [a35] of ATRACCIO (nom "Ghetto Jueu")        (ciutat [c3]) (duracio 0.5) (preu_atraccio 0)  (coneguda FALSE) (tematica CULTURAL))
 
     ;; Orlando (c4)
-    (make-instance [a10] of ATRACCIO (nom "Walt Disney World")  (ciutat [c4]) (duracio 2.0) (preu_atraccio 120) (coneguda TRUE))
-    (make-instance [a11] of ATRACCIO (nom "Universal Studios")  (ciutat [c4]) (duracio 1.0) (preu_atraccio 115) (coneguda TRUE))
-    (make-instance [a36] of ATRACCIO (nom "Gatorland")          (ciutat [c4]) (duracio 0.5) (preu_atraccio 35)  (coneguda FALSE))
-    (make-instance [a37] of ATRACCIO (nom "Harry P. Leu Gardens")(ciutat [c4]) (duracio 0.5) (preu_atraccio 15)  (coneguda FALSE))
-    (make-instance [a38] of ATRACCIO (nom "Wekiwa Springs")     (ciutat [c4]) (duracio 1.0) (preu_atraccio 6)   (coneguda FALSE))
+    (make-instance [a10] of ATRACCIO (nom "Walt Disney World")  (ciutat [c4]) (duracio 2.0) (preu_atraccio 120) (coneguda TRUE)  (tematica DIVERSIO))
+    (make-instance [a11] of ATRACCIO (nom "Universal Studios")  (ciutat [c4]) (duracio 1.0) (preu_atraccio 115) (coneguda TRUE)  (tematica DIVERSIO))
+    (make-instance [a36] of ATRACCIO (nom "Gatorland")          (ciutat [c4]) (duracio 0.5) (preu_atraccio 35)  (coneguda FALSE) (tematica DIVERSIO))
+    (make-instance [a37] of ATRACCIO (nom "Harry P. Leu Gardens")(ciutat [c4]) (duracio 0.5) (preu_atraccio 15)  (coneguda FALSE) (tematica ROMANTIC))
+    (make-instance [a38] of ATRACCIO (nom "Wekiwa Springs")     (ciutat [c4]) (duracio 1.0) (preu_atraccio 6)   (coneguda FALSE) (tematica DIVERSIO))
 
     ;; Tenerife (c5)
-    (make-instance [a12] of ATRACCIO (nom "Teide")              (ciutat [c5]) (duracio 1.0) (preu_atraccio 25) (coneguda TRUE))
-    (make-instance [a13] of ATRACCIO (nom "Loro Parque")        (ciutat [c5]) (duracio 1.0) (preu_atraccio 40) (coneguda TRUE))
-    (make-instance [a14] of ATRACCIO (nom "Siam Park")          (ciutat [c5]) (duracio 1.0) (preu_atraccio 40) (coneguda TRUE))
-    (make-instance [a39] of ATRACCIO (nom "Anaga Rural Park")   (ciutat [c5]) (duracio 1.0) (preu_atraccio 0)  (coneguda FALSE))
-    (make-instance [a40] of ATRACCIO (nom "Cueva del Viento")   (ciutat [c5]) (duracio 0.5) (preu_atraccio 20) (coneguda FALSE))
-    (make-instance [a41] of ATRACCIO (nom "Acantilados de Los Gigantes") (ciutat [c5]) (duracio 0.5) (preu_atraccio 0) (coneguda FALSE))
+    (make-instance [a12] of ATRACCIO (nom "Teide")              (ciutat [c5]) (duracio 1.0) (preu_atraccio 25) (coneguda TRUE)  (tematica DIVERSIO))
+    (make-instance [a13] of ATRACCIO (nom "Loro Parque")        (ciutat [c5]) (duracio 1.0) (preu_atraccio 40) (coneguda TRUE)  (tematica DIVERSIO))
+    (make-instance [a14] of ATRACCIO (nom "Siam Park")          (ciutat [c5]) (duracio 1.0) (preu_atraccio 40) (coneguda TRUE)  (tematica DIVERSIO))
+    (make-instance [a39] of ATRACCIO (nom "Anaga Rural Park")   (ciutat [c5]) (duracio 1.0) (preu_atraccio 0)  (coneguda FALSE) (tematica CULTURAL))
+    (make-instance [a40] of ATRACCIO (nom "Cueva del Viento")   (ciutat [c5]) (duracio 0.5) (preu_atraccio 20) (coneguda FALSE) (tematica DIVERSIO))
+    (make-instance [a41] of ATRACCIO (nom "Acantilados de Los Gigantes") (ciutat [c5]) (duracio 0.5) (preu_atraccio 0) (coneguda FALSE) (tematica ROMANTIC))
 
     ;; Maldives (c6)
-    (make-instance [a15] of ATRACCIO (nom "Atòl de Malé")       (ciutat [c6]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE))
-    (make-instance [a16] of ATRACCIO (nom "Esculls de corall")  (ciutat [c6]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE))
-    (make-instance [a17] of ATRACCIO (nom "Platges de sorra blanca") (ciutat [c6]) (duracio 1.0) (preu_atraccio 0) (coneguda TRUE))
-    (make-instance [a42] of ATRACCIO (nom "Illa Vaadhoo (Mar d'estrelles)") (ciutat [c6]) (duracio 0.5) (preu_atraccio 0) (coneguda FALSE))
-    (make-instance [a43] of ATRACCIO (nom "Illa local de Maafushi") (ciutat [c6]) (duracio 1.0) (preu_atraccio 0) (coneguda FALSE))
-    (make-instance [a44] of ATRACCIO (nom "Mesquita de Malé")   (ciutat [c6]) (duracio 0.5) (preu_atraccio 0)  (coneguda FALSE))
+    (make-instance [a15] of ATRACCIO (nom "Atòl de Malé")       (ciutat [c6]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE)  (tematica DIVERSIO))
+    (make-instance [a16] of ATRACCIO (nom "Esculls de corall")  (ciutat [c6]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE)  (tematica DIVERSIO))
+    (make-instance [a17] of ATRACCIO (nom "Platges de sorra blanca") (ciutat [c6]) (duracio 1.0) (preu_atraccio 0) (coneguda TRUE)  (tematica ROMANTIC))
+    (make-instance [a42] of ATRACCIO (nom "Illa Vaadhoo (Mar d'estrelles)") (ciutat [c6]) (duracio 0.5) (preu_atraccio 0) (coneguda FALSE) (tematica ROMANTIC))
+    (make-instance [a43] of ATRACCIO (nom "Illa local de Maafushi") (ciutat [c6]) (duracio 1.0) (preu_atraccio 0) (coneguda FALSE) (tematica CULTURAL))
+    (make-instance [a44] of ATRACCIO (nom "Mesquita de Malé")   (ciutat [c6]) (duracio 0.5) (preu_atraccio 0)  (coneguda FALSE) (tematica CULTURAL))
 
     ;; Londres (c7)
-    (make-instance [a18] of ATRACCIO (nom "Big Ben")            (ciutat [c7]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE))
-    (make-instance [a19] of ATRACCIO (nom "London Eye")         (ciutat [c7]) (duracio 0.5) (preu_atraccio 30) (coneguda TRUE))
-    (make-instance [a20] of ATRACCIO (nom "British Museum")     (ciutat [c7]) (duracio 2.0) (preu_atraccio 0)  (coneguda TRUE))
-    (make-instance [a45] of ATRACCIO (nom "Sky Garden")         (ciutat [c7]) (duracio 0.5) (preu_atraccio 0)  (coneguda FALSE))
-    (make-instance [a46] of ATRACCIO (nom "Camden Market")      (ciutat [c7]) (duracio 1.0) (preu_atraccio 0)  (coneguda FALSE))
-    (make-instance [a47] of ATRACCIO (nom "Leadenhall Market")  (ciutat [c7]) (duracio 0.5) (preu_atraccio 0)  (coneguda FALSE))
+    (make-instance [a18] of ATRACCIO (nom "Big Ben")            (ciutat [c7]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE)  (tematica CULTURAL))
+    (make-instance [a19] of ATRACCIO (nom "London Eye")         (ciutat [c7]) (duracio 0.5) (preu_atraccio 30) (coneguda TRUE)  (tematica DIVERSIO))
+    (make-instance [a20] of ATRACCIO (nom "British Museum")     (ciutat [c7]) (duracio 2.0) (preu_atraccio 0)  (coneguda TRUE)  (tematica CULTURAL))
+    (make-instance [a45] of ATRACCIO (nom "Sky Garden")         (ciutat [c7]) (duracio 0.5) (preu_atraccio 0)  (coneguda FALSE) (tematica ROMANTIC))
+    (make-instance [a46] of ATRACCIO (nom "Camden Market")      (ciutat [c7]) (duracio 1.0) (preu_atraccio 0)  (coneguda FALSE) (tematica DIVERSIO))
+    (make-instance [a47] of ATRACCIO (nom "Leadenhall Market")  (ciutat [c7]) (duracio 0.5) (preu_atraccio 0)  (coneguda FALSE) (tematica CULTURAL))
 
     ;; Berlín (c8)
-    (make-instance [a21] of ATRACCIO (nom "Porta de Brandenburg") (ciutat [c8]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE))
-    (make-instance [a22] of ATRACCIO (nom "Mur de Berlín")      (ciutat [c8]) (duracio 1.0) (preu_atraccio 0)  (coneguda TRUE))
-    (make-instance [a23] of ATRACCIO (nom "Illa dels Museus")   (ciutat [c8]) (duracio 2.0) (preu_atraccio 18) (coneguda TRUE))
-    (make-instance [a48] of ATRACCIO (nom "Búnquer de la Guerra Freda") (ciutat [c8]) (duracio 0.5) (preu_atraccio 12) (coneguda FALSE))
-    (make-instance [a49] of ATRACCIO (nom "Teufelsberg")        (ciutat [c8]) (duracio 1.0) (preu_atraccio 8)  (coneguda FALSE))
-    (make-instance [a50] of ATRACCIO (nom "Barri de Nikolaiviertel") (ciutat [c8]) (duracio 0.5) (preu_atraccio 0) (coneguda FALSE))
+    (make-instance [a21] of ATRACCIO (nom "Porta de Brandenburg") (ciutat [c8]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE)  (tematica CULTURAL))
+    (make-instance [a22] of ATRACCIO (nom "Mur de Berlín")      (ciutat [c8]) (duracio 1.0) (preu_atraccio 0)  (coneguda TRUE)  (tematica CULTURAL))
+    (make-instance [a23] of ATRACCIO (nom "Illa dels Museus")   (ciutat [c8]) (duracio 2.0) (preu_atraccio 18) (coneguda TRUE)  (tematica CULTURAL))
+    (make-instance [a48] of ATRACCIO (nom "Búnquer de la Guerra Freda") (ciutat [c8]) (duracio 0.5) (preu_atraccio 12) (coneguda FALSE) (tematica CULTURAL))
+    (make-instance [a49] of ATRACCIO (nom "Teufelsberg")        (ciutat [c8]) (duracio 1.0) (preu_atraccio 8)  (coneguda FALSE) (tematica DIVERSIO))
+    (make-instance [a50] of ATRACCIO (nom "Barri de Nikolaiviertel") (ciutat [c8]) (duracio 0.5) (preu_atraccio 0) (coneguda FALSE) (tematica ROMANTIC))
 
     ;; Bali (c9)
-    (make-instance [a24] of ATRACCIO (nom "Temple d'Uluwatu")   (ciutat [c9]) (duracio 1.0) (preu_atraccio 3)  (coneguda TRUE))
-    (make-instance [a25] of ATRACCIO (nom "Camps d'arròs d'Ubud") (ciutat [c9]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE))
-    (make-instance [a26] of ATRACCIO (nom "Tanah Lot")          (ciutat [c9]) (duracio 0.5) (preu_atraccio 3)  (coneguda TRUE))
-    (make-instance [a51] of ATRACCIO (nom "Cascada Sekumpul")   (ciutat [c9]) (duracio 1.0) (preu_atraccio 2)  (coneguda FALSE))
-    (make-instance [a52] of ATRACCIO (nom "Illa de Nusa Penida")(ciutat [c9]) (duracio 2.0) (preu_atraccio 15) (coneguda FALSE))
-    (make-instance [a53] of ATRACCIO (nom "Sidemen Valley")     (ciutat [c9]) (duracio 1.0) (preu_atraccio 0)  (coneguda FALSE))
-
+    (make-instance [a24] of ATRACCIO (nom "Temple d'Uluwatu")   (ciutat [c9]) (duracio 1.0) (preu_atraccio 3)  (coneguda TRUE)  (tematica CULTURAL))
+    (make-instance [a25] of ATRACCIO (nom "Camps d'arròs d'Ubud") (ciutat [c9]) (duracio 0.5) (preu_atraccio 0)  (coneguda TRUE)  (tematica ROMANTIC))
+    (make-instance [a26] of ATRACCIO (nom "Tanah Lot")          (ciutat [c9]) (duracio 0.5) (preu_atraccio 3)  (coneguda TRUE)  (tematica CULTURAL))
+    (make-instance [a51] of ATRACCIO (nom "Cascada Sekumpul")   (ciutat [c9]) (duracio 1.0) (preu_atraccio 2)  (coneguda FALSE) (tematica DIVERSIO))
+    (make-instance [a52] of ATRACCIO (nom "Illa de Nusa Penida")(ciutat [c9]) (duracio 2.0) (preu_atraccio 15) (coneguda FALSE) (tematica DIVERSIO))
+    (make-instance [a53] of ATRACCIO (nom "Sidemen Valley")     (ciutat [c9]) (duracio 1.0) (preu_atraccio 0)  (coneguda FALSE) (tematica ROMANTIC))
+    
     ;; Rutes des de París
     (make-instance [t1] of TRANSPORT (ciutat_origen "Paris") (ciutat_desti "Londres") (tipus_transport TREN) (preu_transport 50))
     (make-instance [t2] of TRANSPORT (ciutat_origen "Paris") (ciutat_desti "Berlin")  (tipus_transport TREN) (preu_transport 50))
@@ -455,7 +470,7 @@
     (create$ ?preu_atraccions ?seleccionades)    
 )
 
-(defrule filtra-allotjaments-valids
+(defrule RECOMANACIO::filtra-allotjaments-valids
     (declare (salience 30))
     (object (is-a USUARI) (sacrifica_qualitat ?sacrifica))
     (object (is-a ALLOTJAMENT) (name ?allotjament) (estrelles ?estrelles))
@@ -586,6 +601,35 @@
     )
 )
 
+(deffunction compta-atraccions-tematica (?tematica $?atraccions)
+    (bind ?comptador 0)
+    (progn$ (?a $?atraccions)
+        (if (eq (send ?a get-tematica) ?tematica) then
+            (bind ?comptador (+ ?comptador 1))
+        )
+    )
+    ?comptador
+)
+
+(defrule RECOMANACIO::puntua-coherencia-objectiu
+    (declare (salience 5))
+    ?viatge <- (VIATGE (ciutats $?cs) (dies_ciutat $?dies_ciutat) (cost_total ?cost) (atraccions $?as) (allotjaments $?allotjaments) (transports $?ts) (puntuacio 0))
+    (object (is-a USUARI) (objectiu_deduit ?obj) (pressupost_max ?pres) (estil_economic ?estil_economic))
+    =>
+    (bind ?punts 0)
+    (bind ?punts (+ ?punts (* 10 (compta-atraccions-tematica ?obj $?as))))
+    (if (<= ?cost ?pres) then
+        (bind ?punts (+ ?punts 20))
+    )
+    (if (eq ?estil_economic TRUE) then
+        (bind ?punts (- ?punts (* 0.02 ?cost))) ;; 500 eur resta 10
+    else
+        (bind ?punts (- ?punts (* 0.001 ?cost)))
+    )
+
+    (modify ?viatge (puntuacio ?punts))
+)
+
 (defrule RECOMANACIO::imprimeix-text-dalt
     (declare (salience -3))
     (not (text-impres))
@@ -603,89 +647,127 @@
     (assert (text-impres))
 )
 
+(deffunction ordena_viatges (?dies_min ?ciutats_min) 
+    (bind ?llista (create$))
+    (do-for-all-facts ((?v VIATGE))
+        ;; no ho hem comprovat encara
+        (and (>= ?v:dies_total ?dies_min)
+             (>= (length$ ?v:ciutats) ?ciutats_min))
+        (bind ?llista (create$ ?llista ?v))
+    )
+
+    ;; Bubble sort per puntuació descendent
+    (bind ?mida (length$ ?llista))
+    (loop-for-count (?i 1 ?mida) do
+        (loop-for-count (?j (+ ?i 1) ?mida) do
+            (bind ?vi (nth$ ?i ?llista))
+            (bind ?vj (nth$ ?j ?llista))
+            (if (< (fact-slot-value ?vi puntuacio)
+                   (fact-slot-value ?vj puntuacio)) then
+                (bind ?llista (replace$ ?llista ?i ?i ?vj))
+                (bind ?llista (replace$ ?llista ?j ?j ?vi))
+            )
+        )
+    )
+    ?llista
+)
+
+(deffunction imprimir_n_millors (?n ?viatges ?pres ?sacrifica) 
+    (bind ?mida (length$ ?viatges))
+    (bind ?m (min ?n ?mida))
+    (loop-for-count (?i 1 ?m) do
+        (bind ?v (nth$ ?i ?viatges))
+        
+        (bind ?cs (fact-slot-value ?v ciutats))
+        (bind ?ds (fact-slot-value ?v dies_ciutat))
+        (bind ?dies (fact-slot-value ?v dies_total))
+        (bind ?cost (fact-slot-value ?v cost_total))
+        (bind ?ts (fact-slot-value ?v transports))
+        (bind ?as (fact-slot-value ?v atraccions))
+        (bind ?allotjaments (fact-slot-value ?v allotjaments))
+        (bind ?puntuacio (fact-slot-value ?v puntuacio))
+
+        (printout t crlf "Ruta (" (length$ ?cs) " destins): ")
+        ;; Imprimir ciutats
+        ;; progn -> es repeteixen les inst del bloc 1 cop per element llista
+        (progn$ (?ciutat ?cs)
+            (bind ?dur (nth ?ciutat-index $?ds))
+            (printout t (send ?ciutat get-nom) " ["?dur "d]")
+            (if (< ?ciutat-index (length$ ?cs)) then
+                (printout t " → "))
+        )
+        ;; Imprimir allotjaments
+        (printout t crlf "   Allotjaments: ")
+        (progn$ (?allotjament ?allotjaments)
+            (bind ?ciutat (send ?allotjament get-ciutat))
+            (printout t (send ?ciutat get-nom) ": " (send ?allotjament get-nom) 
+                        " " (send ?allotjament get-estrelles) "* ("
+                        (send ?allotjament get-preu_nit) "€)")
+            (if (< ?allotjament-index (length$ ?allotjaments)) then 
+                (printout t ", "))
+        )
+        
+        ;; Imprimir atraccions 
+        (printout t crlf "   Visites: ")
+        (progn$ (?ciutat ?cs)
+            ;; Subcadena de atraccions (de la ciutat)
+            (bind ?as_ciutat (create$))
+            (progn$ (?a ?as)
+                (if (eq (send ?a get-ciutat) ?ciutat) then
+                    (bind ?as_ciutat (create$ ?as_ciutat ?a)))
+            )
+
+            (printout t crlf "     · " (send ?ciutat get-nom) ": ")
+            (if (> (length$ ?as_ciutat) 0) then        
+                (progn$ (?a $?as_ciutat)
+                    (printout t (send ?a get-nom) " (" (send ?a get-preu_atraccio) "€)")
+                    (if (< ?a-index (length$ $?as_ciutat)) then
+                        (printout t ", "))
+                )
+            else
+                (printout t "(sense visites)")
+            )
+        )
+        ;; Imprimir cost i dies
+        (if (<= ?cost ?pres)then
+            (printout t crlf "   Dies total: " ?dies
+                            " | Preu total: " ?cost " €" crlf)
+        else (if (and (eq ?sacrifica TRUE)
+                    (<= ?cost (* ?pres 1.25))) then
+            (printout t crlf "   Dies total: " ?dies
+                            " | PREU AJUSTAT: " ?cost " €" crlf)
+        )
+        )
+        ;; Imprimir transport
+        (if (> (length$ ?ts) 0) then
+            (printout t "   Transports: ")
+            (bind ?idx 1)
+            (progn$ (?transport ?ts)
+                (printout t (send ?transport get-ciutat_origen) 
+                "-" (send ?transport get-ciutat_desti) 
+                ": " (send ?transport get-tipus_transport)
+                " (" (send ?transport get-preu_transport) " €)")
+                (if (< ?idx (length$ ?ts)) then (printout t " → "))
+                (bind ?idx (+ ?idx 1))
+            )
+            (printout t crlf)
+        )
+
+        ;; Imprimir puntuacio
+        (printout t "   Puntuació: " ?puntuacio crlf)
+    )
+)
+
 (defrule RECOMANACIO::imprimeix-sequencia-valida
     (declare (salience -5))
     (object (is-a USUARI) (name [usuari_actual])
-            (dies_min ?dies-min)
-            (ciutats_min ?ciutats-min)
+            (dies_min ?dies_min)
+            (ciutats_min ?ciutats_min)
             (pressupost_max ?pres)
             (sacrifica_qualitat ?sacrifica))
-    (VIATGE 
-        (ciutats $?cs)
-        (dies_ciutat $?ds) 
-        (dies_total ?dies) 
-        (cost_total ?cost)
-        (transports $?ts)
-        (atraccions $?as)
-        (allotjaments $?allotjaments))
-    (test (>= ?dies ?dies-min))
-    (test (>= (length $?cs) ?ciutats-min))
     =>
-    (printout t crlf "Ruta (" (length$ ?cs) " destins): ")
-    ;; Imprimir ciutats
-    ;; progn -> es repeteixen les inst del bloc 1 cop per element llista
-    (progn$ (?ciutat ?cs)
-        (bind ?dur (nth ?ciutat-index $?ds))
-        (printout t (send ?ciutat get-nom) " ["?dur "d]")
-        (if (< ?ciutat-index (length$ ?cs)) then
-            (printout t " → "))
-    )
-    ;; Imprimir allotjaments
-    (printout t crlf "   Allotjaments: ")
-    (progn$ (?allotjament ?allotjaments)
-        (bind ?ciutat (send ?allotjament get-ciutat))
-        (printout t (send ?ciutat get-nom) ": " (send ?allotjament get-nom) 
-                    " " (send ?allotjament get-estrelles) "* ("
-                    (send ?allotjament get-preu_nit) ")")
-        (if (< ?allotjament-index (length$ ?allotjaments)) then 
-            (printout t ", "))
-    )
-    
-    ;; Imprimir atraccions 
-    (printout t crlf "   Visites: ")
-    (progn$ (?ciutat ?cs)
-        ;; Subcadena de atraccions (de la ciutat)
-        (bind ?as_ciutat (create$))
-        (progn$ (?a ?as)
-            (if (eq (send ?a get-ciutat) ?ciutat) then
-                (bind ?as_ciutat (create$ ?as_ciutat ?a)))
-        )
-
-        (printout t crlf "     · " (send ?ciutat get-nom) ": ")
-        (if (> (length$ ?as_ciutat) 0) then        
-            (progn$ (?a $?as_ciutat)
-                (printout t (send ?a get-nom) " (" (send ?a get-preu_atraccio) "€)")
-                (if (< ?a-index (length$ $?as_ciutat)) then
-                    (printout t ", "))
-            )
-        else
-            (printout t "(sense visites)")
-        )
-    )
-    ;; Imprimir cost i dies
-    (if (<= ?cost ?pres)then
-        (printout t crlf "   Dies total: " ?dies
-                        " | Preu total: " ?cost " €" crlf)
-    else (if (and (eq ?sacrifica TRUE)
-                   (<= ?cost (* ?pres 1.25))) then
-        (printout t crlf "   Dies total: " ?dies
-                        " | PREU AJUSTAT: " ?cost " €" crlf)
-    )
-    )
-    ;; Imprimir transport
-    (if (> (length$ ?ts) 0) then
-        (printout t "   Transports: ")
-        (bind ?idx 1)
-        (progn$ (?transport ?ts)
-            (printout t (send ?transport get-ciutat_origen) 
-            "-" (send ?transport get-ciutat_desti) 
-            ": " (send ?transport get-tipus_transport)
-            " (" (send ?transport get-preu_transport) " €)")
-            (if (< ?idx (length$ ?ts)) then (printout t " → "))
-            (bind ?idx (+ ?idx 1))
-        )
-        (printout t crlf)
-    )
+    (bind $?viatges_ordenats_per_puntuacio (ordena_viatges ?dies_min ?ciutats_min))
+    (imprimir_n_millors 2 ?viatges_ordenats_per_puntuacio ?pres ?sacrifica)
 
     (assert (solucio-trobada))
 )

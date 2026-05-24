@@ -7,8 +7,8 @@
     (slot dies_max (type INTEGER))
     (slot viatja_amb_nens (type SYMBOL) (allowed-values TRUE FALSE))
     (slot sacrifica_qualitat (type SYMBOL) (allowed-values TRUE FALSE))
-    (slot perfil_deduit (type SYMBOL) (allowed-values INDIVIDUAL PARELLA FAMILIA GRUP DESCONEGUT) (default DESCONEGUT))
-    (slot objectiu_deduit (type SYMBOL) (allowed-values ROMANTIC CULTURAL DESCANS DIVERSIO DESCONEGUT) (default DESCONEGUT))
+    (slot perfil_deduit (type SYMBOL) (allowed-values INDIVIDUAL PARELLA FAMILIA GRUP))
+    (slot objectiu_deduit (type SYMBOL) (allowed-values ROMANTIC CULTURAL DIVERSIO DESCONEGUT))
     (slot rang_edat (type SYMBOL) (allowed-values MENOR JOVE MITJANA-EDAT GRAN))
     (slot ciutats_min (type INTEGER))
     (slot ciutats_max (type INTEGER))
@@ -22,7 +22,7 @@
 (defclass CIUTAT (is-a USER)
     (slot nom (type STRING))
     (slot tematica (type SYMBOL) (allowed-values MEDITERRANIA EUROPEA_GRAN NATURALESA))
-    (slot tipus_viatge (type SYMBOL) (allowed-values ROMANTIC CULTURAL DESCANS DIVERSIO))
+    (slot tipus_viatge (type SYMBOL) (allowed-values ROMANTIC CULTURAL DIVERSIO))
 )
 
 (defclass TRANSPORT (is-a USER)
@@ -38,6 +38,7 @@
     (slot duracio (type FLOAT)) ;; en dies (0.5, 1, 2)
     (slot coneguda (type SYMBOL) (allowed-values TRUE FALSE))
     (slot preu_atraccio (type INTEGER))
+    (slot tematica (type SYMBOL) (allowed-values ROMANTIC CULTURAL DIVERSIO))
 )
 
 (defclass ALLOTJAMENT (is-a USER)
