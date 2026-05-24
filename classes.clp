@@ -1,7 +1,7 @@
 ;;; Definició de les classes principals basades en l'ontologia
 
 (defclass USUARI (is-a USER)
-    (slot persones_viatjant (type INTEGER))
+    (slot persones_viatjant (type INTEGER) (default 1))
     (slot pressupost_max (type INTEGER))
     (slot dies_min (type INTEGER))
     (slot dies_max (type INTEGER))
@@ -14,6 +14,8 @@
     (slot ciutats_max (type INTEGER))
     (slot dies_ciutats_min (type INTEGER))
     (slot dies_ciutats_max (type INTEGER))
+    (slot estil_economic (type SYMBOL) (allowed-values TRUE FALSE) (default FALSE)) 
+    (slot destins_desconeguts (type SYMBOL) (allowed-values TRUE FALSE) (default FALSE)) 
     (multislot transport_prohibit (type SYMBOL) (allowed-values TREN AVIO VAIXELL CAP))
 )
 
@@ -34,9 +36,8 @@
     (slot nom (type STRING))
     (slot ciutat (type INSTANCE) (allowed-classes CIUTAT))
     (slot duracio (type FLOAT)) ;; en dies (0.5, 1, 2)
-    (slot conegut (type SYMBOL) (allowed-values SI NO))
+    (slot coneguda (type SYMBOL) (allowed-values TRUE FALSE))
     (slot preu_atraccio (type INTEGER))
-    ;; importancia
 )
 
 (defclass ALLOTJAMENT (is-a USER)
