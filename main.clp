@@ -1055,31 +1055,47 @@
     ?llista
 )
 
-(deffunction imprimir_n_millors (?n ?viatges ?pres ?sacrifica) 
+(deftemplate conjunt-ciutats-vist
+    (multislot ciutats)
+)
+
+(deffunction conjunts-iguals (?cs1 ?cs2)
+    (if (neq (length$ ?cs1) (length$ ?cs2)) then
+        (return FALSE)
+    )
+    (progn$ (?ciutat ?cs1)
+        (if (not (member$ ?ciutat ?cs2)) then
+            (return FALSE)
+        )
+    )
+    (return TRUE)
+)
+
+(deffunction ja-vist (?cs)
+    (do-for-all-facts ((?f conjunt-ciutats-vist)) TRUE
+        (if (conjunts-iguals ?cs ?f:ciutats) then
+            (return TRUE)
+        )
+    )
+    (return FALSE)
+)
+
+(deffunction imprimir_n_millors (?n ?viatges ?pres ?sacrifica)
+    ;; Netejar facts auxiliars d'execucions anteriors
+    (do-for-all-facts ((?f conjunt-ciutats-vist)) TRUE
+        (retract ?f)
+    )
+
     (bind ?mida (length$ ?viatges))
-    (bind ?ciutats-usades (create$))
     (bind ?impresos 0)
     (bind ?i 1)
-
     (while (and (<= ?i ?mida) (< ?impresos ?n)) do
         (bind ?v (nth$ ?i ?viatges))
         (bind ?cs (fact-slot-value ?v ciutats))
 
-        ;; Comprova si alguna ciutat d'aquest viatge ja ha estat usada
-        (bind ?solapament FALSE)
-        (progn$ (?ciutat ?cs)
-            (if (member$ ?ciutat ?ciutats-usades) then
-                (bind ?solapament TRUE)
-            )
-        )
-
-        (if (eq ?solapament FALSE) then
-            ;; Afegim les ciutats d'aquest viatge a les usades
-            (progn$ (?ciutat ?cs)
-                (bind ?ciutats-usades (create$ ?ciutats-usades ?ciutat))
-            )
+        (if (not (ja-vist ?cs)) then
+            (assert (conjunt-ciutats-vist (ciutats ?cs)))
             (bind ?impresos (+ ?impresos 1))
-
             (bind ?ds (fact-slot-value ?v dies_ciutat))
             (bind ?dies (fact-slot-value ?v dies_total))
             (bind ?cost (fact-slot-value ?v cost_total))
@@ -1087,7 +1103,6 @@
             (bind ?as (fact-slot-value ?v atraccions))
             (bind ?allotjaments (fact-slot-value ?v allotjaments))
             (bind ?puntuacio (fact-slot-value ?v puntuacio))
-
             (printout t crlf "Ruta (" (length$ ?cs) " destins): ")
             (progn$ (?ciutat ?cs)
                 (bind ?dur (nth$ ?ciutat-index $?ds))
@@ -1099,8 +1114,8 @@
             (progn$ (?allotjament ?allotjaments)
                 (bind ?ciutat (send ?allotjament get-ciutat))
                 (printout t (send ?ciutat get-nom) ": " (send ?allotjament get-nom) 
-                            " " (send ?allotjament get-estrelles) "* ("
-                            (send ?allotjament get-preu_nit) "€)")
+                    " " (send ?allotjament get-estrelles) "* ("
+                    (send ?allotjament get-preu_nit) "€)")
                 (if (< ?allotjament-index (length$ ?allotjaments)) then 
                     (printout t ", "))
             )
@@ -1124,20 +1139,20 @@
             )
             (if (<= ?cost ?pres) then
                 (printout t crlf "   Dies total: " ?dies
-                                " | Preu total: " ?cost " €" crlf)
+                    " | Preu total: " ?cost " €" crlf)
             else (if (and (eq ?sacrifica TRUE)
-                        (<= ?cost (* ?pres 1.25))) then
+                          (<= ?cost (* ?pres 1.25))) then
                 (printout t crlf "   Dies total: " ?dies
-                                " | PREU AJUSTAT: " ?cost " €" crlf)
+                    " | PREU AJUSTAT: " ?cost " €" crlf)
             ))
             (if (> (length$ ?ts) 0) then
                 (printout t "   Transports: ")
                 (bind ?idx 1)
                 (progn$ (?transport ?ts)
                     (printout t (send ?transport get-ciutat_origen) 
-                    "-" (send ?transport get-ciutat_desti) 
-                    ": " (send ?transport get-tipus_transport)
-                    " (" (send ?transport get-preu_transport) " €)")
+                        "-" (send ?transport get-ciutat_desti) 
+                        ": " (send ?transport get-tipus_transport)
+                        " (" (send ?transport get-preu_transport) " €)")
                     (if (< ?idx (length$ ?ts)) then (printout t " → "))
                     (bind ?idx (+ ?idx 1))
                 )
